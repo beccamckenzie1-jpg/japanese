@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本語 JLPT Revision — N4/N5</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ── AUTH OVERLAY ── */
+#auth-overlay {
+  position:fixed; inset:0; background:var(--paper);
+  z-index:9999; display:flex; align-items:center; justify-content:center;
+}
+.auth-box {
+  background:white; border:1.5px solid var(--border); border-radius:14px;
+  padding:36px 32px; width:100%; max-width:360px; box-shadow:var(--shadow-lg);
+  text-align:center;
+}
+.auth-box .auth-logo { font-family:'Shippori Mincho',serif; font-size:1.6rem; margin-bottom:4px; }
+.auth-box .auth-logo span { color:var(--gold); }
+.auth-box .auth-sub { font-size:.72rem; color:var(--grey); margin-bottom:24px; letter-spacing:.08em; text-transform:uppercase; }
+.auth-inp {
+  width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:7px;
+  font-family:'DM Mono',monospace; font-size:.88rem; outline:none;
+  margin-bottom:11px; transition:border-color .15s; background:var(--paper);
+}
+.auth-inp:focus { border-color:var(--red); }
+.auth-err { font-size:.75rem; color:var(--red); margin-bottom:10px; min-height:18px; }
+.auth-switch { font-size:.72rem; color:var(--grey); margin-top:14px; }
+.auth-switch a { color:var(--red); cursor:pointer; text-decoration:underline; }
+#auth-user-bar { font-size:.68rem; color:#a09080; letter-spacing:.08em; display:flex; align-items:center; gap:10px; }
+#auth-user-bar a { color:#e8c84a; cursor:pointer; text-decoration:underline; font-size:.65rem; }
+.sync-dot { width:7px; height:7px; border-radius:50%; background:var(--border); display:inline-block; margin-right:3px; transition:background .3s; }
+.sync-dot.syncing { background:var(--gold); animation:pulse .8s infinite; }
+.sync-dot.synced  { background:var(--green); }
+.sync-dot.error   { background:var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+:root {
+  --ink: #18130f;
+  --paper: #faf8f3;
+  --paper2: #f1ece2;
+  --paper3: #e8e0d2;
+  --red: #b5272a;
+  --red-soft: #f0dada;
+  --gold: #9a6f00;
+  --gold-light: #fdf0c0;
+  --green: #1e5c3a;
+  --green-light: #d4edda;
+  --blue: #1a3f6e;
+  --blue-light: #d3e4f5;
+  --purple: #4a2a6e;
+  --purple-light: #e8daf5;
+  --grey: #6a6058;
+  --border: #cfc5b3;
+  --shadow: 0 2px 10px rgba(24,19,15,0.09);
+  --shadow-lg: 0 8px 28px rgba(24,19,15,0.14);
+  --radius: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Mono', monospace; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+/* ── HEADER ── */
+header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 16px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+  border-bottom: 3px solid var(--gold);
+}
+.logo { font-family: 'Shippori Mincho', serif; font-size: 1.35rem; letter-spacing: .06em; }
+.logo span { color: #e8c84a; }
+.logo-sub { font-size: .68rem; color: #a09080; margin-top: 2px; letter-spacing: .14em; text-transform: uppercase; }
+.streak { font-size: .72rem; color: #e8c84a; letter-spacing: .08em; }
+
+/* ── NAV ── */
+nav {
+  background: var(--paper2); border-bottom: 2px solid var(--border);
+  display: flex; overflow-x: auto; padding: 0 20px; gap: 0;
+  position: sticky; top: 65px; z-index: 100;
+}
+.tab {
+  padding: 13px 18px; font-size: .73rem; font-family: 'DM Mono', monospace;
+  letter-spacing: .09em; color: var(--grey); cursor: pointer;
+  border: none; border-bottom: 3px solid transparent;
+  background: none; white-space: nowrap; text-transform: uppercase;
+  transition: color .15s, border-color .15s;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--red); border-bottom-color: var(--red); font-weight: 500; }
+
+/* ── MAIN ── */
+main { max-width: 1120px; margin: 0 auto; padding: 28px 20px 80px; }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TYPOGRAPHY ── */
+.page-title { font-family: 'Shippori Mincho', serif; font-size: 1.9rem; margin-bottom: 4px; }
+.page-title em { font-style: italic; color: var(--red); }
+.page-desc { color: var(--grey); font-size: .78rem; margin-bottom: 24px; letter-spacing: .04em; }
+h2.section-h { font-family: 'Shippori Mincho', serif; font-size: 1.15rem; margin: 28px 0 14px; border-left: 3px solid var(--gold); padding-left: 10px; }
+
+/* ── TAGS ── */
+.tag {
+  display: inline-block; font-size: .62rem; padding: 2px 9px;
+  border-radius: 99px; letter-spacing: .05em; font-weight: 500;
+}
+.tag-red { background: var(--red-soft); color: var(--red); }
+.tag-green { background: var(--green-light); color: var(--green); }
+.tag-blue { background: var(--blue-light); color: var(--blue); }
+.tag-gold { background: var(--gold-light); color: var(--gold); }
+.tag-purple { background: var(--purple-light); color: var(--purple); }
+.tag-grey { background: var(--paper3); color: var(--grey); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-block; padding: 10px 24px;
+  background: var(--ink); color: var(--paper);
+  border: none; border-radius: 6px;
+  font-family: 'DM Mono', monospace; font-size: .78rem;
+  letter-spacing: .07em; cursor: pointer; text-transform: uppercase;
+  transition: background .15s;
+}
+.btn:hover { background: var(--red); }
+.btn.outline { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
+.btn.outline:hover { background: var(--paper3); }
+.btn.green-btn { background: var(--green); }
+.btn.green-btn:hover { background: #2d8a56; }
+
+/* ── FILTER BAR ── */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 18px; align-items: center; }
+.filter-bar input, .filter-bar select {
+  background: white; border: 1.5px solid var(--border); border-radius: 6px;
+  padding: 8px 13px; font-family: 'DM Mono', monospace; font-size: .78rem;
+  color: var(--ink); outline: none; transition: border-color .15s;
+}
+.filter-bar input { flex: 1; min-width: 200px; }
+.filter-bar input:focus, .filter-bar select:focus { border-color: var(--red); }
+.count-badge { font-size: .7rem; color: var(--grey); margin-left: auto; }
+
+/* ── CARDS ── */
+.card {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+
+/* ──────────────────────────────────────────
+   DASHBOARD
+──────────────────────────────────────────*/
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 14px; margin-bottom: 28px; }
+.stat-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; box-shadow: var(--shadow); }
+.stat-card .n { font-family: 'Shippori Mincho', serif; font-size: 2.6rem; color: var(--red); line-height: 1; }
+.stat-card .l { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--grey); margin-top: 5px; }
+
+.lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap: 14px; }
+.lesson-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.lesson-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.lesson-card .lnum { font-size: .63rem; text-transform: uppercase; letter-spacing: .13em; color: var(--grey); margin-bottom: 5px; }
+.lesson-card h3 { font-family: 'Shippori Mincho', serif; font-size: 1rem; margin-bottom: 9px; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 4px; }
+
+/* ──────────────────────────────────────────
+   VOCAB
+──────────────────────────────────────────*/
+.vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 11px; }
+.vocab-card {
+  background: white; border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 14px 16px; box-shadow: var(--shadow); cursor: pointer;
+  position: relative; transition: background .12s;
+  user-select: none;
+}
+.vocab-card:hover { background: #fdf9f5; }
+.vc-lesson { position: absolute; top: 9px; right: 11px; font-size: .58rem; text-transform: uppercase; letter-spacing: .1em; color: var(--grey); }
+.vc-kana { font-family: 'Noto Sans JP', sans-serif; font-size: 1.08rem; font-weight: 500; }
+.vc-kanji { font-family: 'Noto Serif JP', serif; font-size: .9rem; color: var(--grey); margin-top: 1px; }
+.vc-meaning { font-size: .8rem; color: var(--blue); margin-top: 4px; font-style: italic; display: none; }
+.vc-hint { font-size: .6rem; color: #c0b8ae; margin-top: 5px; }
+.vc-type { margin-top: 5px; }
+
+/* ──────────────────────────────────────────
+   GRAMMAR
+──────────────────────────────────────────*/
+.grammar-list { display: flex; flex-direction: column; gap: 14px; }
+.grammar-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); }
+.gc-level { font-size: .6rem; text-transform: uppercase; letter-spacing: .12em; color: var(--grey); margin-bottom: 6px; }
+.gc-pattern { font-family: 'Shippori Mincho', serif; font-size: 1.2rem; color: var(--red); margin-bottom: 3px; }
+.gc-meaning { font-size: .85rem; margin-bottom: 10px; color: var(--ink); }
+.gc-formation {
+  background: var(--paper2); border-left: 3px solid var(--gold);
+  padding: 8px 12px; font-size: .75rem; margin-bottom: 12px;
+  border-radius: 0 4px 4px 0; font-family: 'Noto Sans JP', sans-serif;
+  white-space: pre-line; line-height: 1.7;
+}
+.gc-examples { display: flex; flex-direction: column; gap: 7px; }
+.gc-ex .jp { font-family: 'Noto Sans JP', sans-serif; font-size: .87rem; }
+.gc-ex .en { font-size: .76rem; color: var(--grey); font-style: italic; margin-top: 1px; }
+details summary { cursor: pointer; font-size: .72rem; color: var(--grey); text-transform: uppercase; letter-spacing: .09em; margin-top: 10px; }
+details[open] summary { color: var(--red); }
+
+/* ──────────────────────────────────────────
+   KANJI
+──────────────────────────────────────────*/
+.kanji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px,1fr)); gap: 11px; }
+.kanji-card {
+  background: white; border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 16px 14px; box-shadow: var(--shadow); text-align: center;
+  cursor: pointer; transition: background .12s; position: relative;
+  user-select: none;
+}
+.kanji-card:hover { background: #fdf9f5; }
+.kc-level { position: absolute; top: 7px; right: 9px; font-size: .55rem; text-transform: uppercase; letter-spacing: .1em; color: var(--grey); }
+.kc-char { font-family: 'Noto Serif JP', serif; font-size: 2.4rem; color: var(--ink); line-height: 1.1; margin-bottom: 5px; }
+.kc-on { font-family: 'Noto Sans JP', sans-serif; font-size: .72rem; color: var(--grey); }
+.kc-kun { font-family: 'Noto Sans JP', sans-serif; font-size: .72rem; color: var(--blue); }
+.kc-meaning { font-size: .72rem; color: var(--ink); margin-top: 5px; display: none; font-weight: 500; }
+.kc-hint { font-size: .58rem; color: #c0b8ae; margin-top: 4px; }
+.kc-strokes { position: absolute; bottom: 7px; right: 9px; font-size: .58rem; color: #c0b8ae; }
+
+/* ──────────────────────────────────────────
+   QUIZ
+──────────────────────────────────────────*/
+.quiz-setup { background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 26px; box-shadow: var(--shadow); max-width: 540px; }
+.quiz-setup h3 { font-family: 'Shippori Mincho', serif; font-size: 1.25rem; margin-bottom: 18px; }
+.opt-group { margin-bottom: 18px; }
+.opt-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: var(--grey); display: block; margin-bottom: 8px; }
+.pill-group { display: flex; flex-wrap: wrap; gap: 7px; }
+.pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--paper2); border: 1.5px solid var(--border);
+  border-radius: 99px; padding: 5px 14px; cursor: pointer;
+  font-size: .75rem; transition: all .14s; user-select: none;
+}
+.pill input { display: none; }
+.pill.on { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.pill.on-blue { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+
+/* quiz active */
+.quiz-wrap { max-width: 560px; }
+.quiz-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.quiz-ctr { font-size: .72rem; color: var(--grey); text-transform: uppercase; letter-spacing: .08em; }
+.dots { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 18px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+.dot.ok { background: var(--green); }
+.dot.bad { background: var(--red); }
+.dot.cur { background: var(--gold); }
+
+.q-card {
+  background: white; border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 28px 24px; box-shadow: var(--shadow-lg); margin-bottom: 16px;
+  text-align: center; min-height: 170px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.q-lbl { font-size: .65rem; text-transform: uppercase; letter-spacing: .13em; color: var(--grey); margin-bottom: 12px; }
+.q-main { font-family: 'Noto Serif JP', serif; font-size: 1.9rem; line-height: 1.4; }
+.q-sub { font-family: 'Noto Sans JP', sans-serif; font-size: .9rem; color: var(--grey); margin-top: 7px; }
+.q-mode-badge { font-size: .62rem; margin-top: 10px; }
+
+.quiz-inp {
+  width: 100%; padding: 11px 15px;
+  border: 2px solid var(--border); border-radius: 8px;
+  font-family: 'Noto Sans JP', sans-serif; font-size: 1rem;
+  text-align: center; outline: none; margin-bottom: 11px;
+  transition: border-color .15s;
+}
+.quiz-inp:focus { border-color: var(--red); }
+.quiz-inp.ok { border-color: var(--green); background: var(--green-light); }
+.quiz-inp.bad { border-color: var(--red); background: var(--red-soft); }
+
+.feedback {
+  padding: 11px 15px; border-radius: 8px; font-size: .83rem;
+  margin-bottom: 11px; display: none; font-family: 'Noto Sans JP', sans-serif;
+}
+.feedback.show { display: block; }
+.feedback.ok { background: var(--green-light); color: var(--green); }
+.feedback.bad { background: var(--red-soft); color: var(--red); }
+.quiz-btns { display: flex; gap: 9px; justify-content: center; }
+
+/* score */
+.score-card { background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 38px 28px; text-align: center; box-shadow: var(--shadow-lg); max-width: 420px; }
+.score-big { font-family: 'Shippori Mincho', serif; font-size: 4rem; color: var(--red); }
+.score-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .13em; color: var(--grey); margin-bottom: 16px; }
+.score-msg { font-size: .88rem; color: var(--grey); margin-bottom: 22px; line-height: 1.6; }
+.wrong-list { text-align: left; margin-bottom: 22px; max-height: 200px; overflow-y: auto; }
+.wrong-list h4 { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--grey); margin-bottom: 8px; }
+.wrong-item { padding: 6px 0; border-bottom: 1px solid var(--border); font-size: .8rem; font-family: 'Noto Sans JP', sans-serif; }
+.wrong-item .wq { color: var(--ink); }
+.wrong-item .wa { color: var(--green); }
+
+/* ──────────────────────────────────────────
+   READING
+──────────────────────────────────────────*/
+.reading-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 28px 30px; box-shadow: var(--shadow); margin-bottom: 18px; }
+.rc-title { font-size: .65rem; text-transform: uppercase; letter-spacing: .13em; color: var(--grey); font-family: 'DM Mono', monospace; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.rc-text { font-family: 'Noto Serif JP', serif; font-size: 1rem; line-height: 2.6; }
+.rc-text ruby rt { font-size: .6em; color: var(--grey); }
+.rc-q { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.rc-q-title { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: var(--grey); margin-bottom: 8px; font-family: 'DM Mono', monospace; }
+.rc-q-item { font-family: 'Noto Sans JP', sans-serif; font-size: .88rem; margin-bottom: 5px; }
+
+/* ──────────────────────────────────────────
+   KATAKANA DRILL
+──────────────────────────────────────────*/
+.kt-mode-bar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+.kt-mode-btn {
+  padding:9px 20px; border-radius:6px; border:1.5px solid var(--border);
+  background:white; font-family:'DM Mono',monospace; font-size:.76rem;
+  letter-spacing:.07em; text-transform:uppercase; cursor:pointer;
+  transition:all .15s; color:var(--grey);
+}
+.kt-mode-btn.active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.kt-mode-btn:hover:not(.active) { border-color:var(--ink); color:var(--ink); }
+.kt-chart { display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:7px; }
+.kt-cell {
+  background:white; border:1.5px solid var(--border); border-radius:8px;
+  padding:10px 6px; text-align:center; cursor:default; transition:background .12s;
+}
+.kt-cell:hover { background:var(--paper2); }
+.kt-cell .kt-char { font-family:'Noto Serif JP',serif; font-size:1.6rem; line-height:1.1; }
+.kt-cell .kt-rom { font-size:.65rem; color:var(--grey); margin-top:3px; letter-spacing:.05em; }
+.kt-cell.tricky { border-color:var(--red); background:var(--red-soft); }
+.kt-cell.tricky .kt-char { color:var(--red); }
+.kt-cell.tricky .kt-rom { color:var(--red); }
+.kt-drill-wrap { max-width:500px; }
+.kt-score-bar { display:flex; gap:18px; margin-bottom:16px; font-size:.75rem; color:var(--grey); align-items:center; }
+.kt-score-bar .sn { font-family:'Shippori Mincho',serif; font-size:1.2rem; }
+.kt-score-bar .ok-n { color:var(--green); }
+.kt-score-bar .bad-n { color:var(--red); }
+.kt-card {
+  background:white; border:1.5px solid var(--border); border-radius:14px;
+  padding:36px 24px; text-align:center; box-shadow:var(--shadow-lg);
+  margin-bottom:16px; min-height:165px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+.kt-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:var(--gold); }
+.kt-prompt { font-family:'Noto Serif JP',serif; font-size:3.8rem; line-height:1; margin-bottom:8px; }
+.kt-prompt.roman { font-family:'Shippori Mincho',serif; font-size:2.4rem; letter-spacing:.12em; }
+.kt-hint-txt { font-size:.68rem; color:var(--grey); letter-spacing:.09em; text-transform:uppercase; }
+.kt-options { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px; }
+.kt-opt {
+  background:white; border:2px solid var(--border); border-radius:10px;
+  padding:14px; text-align:center; cursor:pointer;
+  font-family:'Noto Serif JP',serif; font-size:1.65rem;
+  transition:all .12s;
+}
+.kt-opt.roman-opt { font-family:'Shippori Mincho',serif; font-size:1.15rem; letter-spacing:.06em; }
+.kt-opt:hover { border-color:var(--gold); background:var(--gold-light); }
+.kt-opt.correct { border-color:var(--green)!important; background:var(--green-light)!important; }
+.kt-opt.wrong   { border-color:var(--red)!important; background:var(--red-soft)!important; }
+.kt-opt.disabled { cursor:default; pointer-events:none; }
+.kt-type-inp {
+  width:100%; padding:12px 14px; border:2px solid var(--border); border-radius:8px;
+  font-family:'DM Mono',monospace; font-size:1.1rem; text-align:center;
+  outline:none; margin-bottom:10px; transition:border-color .15s; letter-spacing:.12em;
+}
+.kt-type-inp:focus { border-color:var(--gold); }
+.kt-type-inp.ok  { border-color:var(--green); background:var(--green-light); }
+.kt-type-inp.bad { border-color:var(--red); background:var(--red-soft); }
+.kt-feedback { padding:10px 14px; border-radius:8px; font-size:.84rem; margin-bottom:10px; display:none; }
+.kt-feedback.show { display:block; }
+.kt-feedback.ok  { background:var(--green-light); color:var(--green); }
+.kt-feedback.bad { background:var(--red-soft); color:var(--red); }
+.kt-timer-bar { height:5px; background:var(--border); border-radius:99px; margin-bottom:18px; overflow:hidden; }
+.kt-timer-fill { height:100%; background:var(--gold); border-radius:99px; transition:width .15s linear; }
+.tricky-pairs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+.pair-card {
+  background:white; border:1.5px solid var(--red-soft); border-radius:10px;
+  padding:14px 18px; box-shadow:var(--shadow); min-width:130px; text-align:center;
+}
+.pair-card .pc-chars { font-family:'Noto Serif JP',serif; font-size:1.9rem; letter-spacing:.12em; color:var(--red); }
+.pair-card .pc-rom { font-size:.72rem; color:var(--grey); margin-top:4px; letter-spacing:.08em; }
+.pair-card .pc-tip { font-size:.68rem; color:var(--ink); margin-top:6px; line-height:1.45; font-style:italic; }
+
+/* ── STATUS BUTTONS ── */
+.status-btns {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.status-btn {
+  flex: 1; padding: 5px 0; border-radius: 5px; border: 1.5px solid var(--border);
+  font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .06em;
+  cursor: pointer; background: var(--paper2); color: var(--grey);
+  text-transform: uppercase; transition: all .14s;
+}
+.status-btn:hover { border-color: var(--ink); color: var(--ink); }
+.status-btn.mastered-btn:hover { border-color: var(--green); background: var(--green-light); color: var(--green); }
+.status-btn.review-btn:hover   { border-color: var(--gold);  background: var(--gold-light);  color: var(--gold); }
+/* card state: mastered */
+.vocab-card.is-mastered  { border-color: var(--green); background: #f5fdf8; opacity:.85; }
+.vocab-card.is-mastered .status-btn.mastered-btn { background:var(--green); color:white; border-color:var(--green); }
+.kanji-card.is-mastered  { border-color: var(--green); background: #f5fdf8; opacity:.85; }
+.kanji-card.is-mastered .status-btn.mastered-btn { background:var(--green); color:white; border-color:var(--green); }
+.grammar-card.is-mastered { border-color: var(--green); background: #f5fdf8; opacity:.85; }
+.grammar-card.is-mastered .status-btn.mastered-btn { background:var(--green); color:white; border-color:var(--green); }
+/* card state: review */
+.vocab-card.is-review  { border-color: var(--gold); background: #fefdf5; }
+.vocab-card.is-review .status-btn.review-btn { background:var(--gold); color:white; border-color:var(--gold); }
+.kanji-card.is-review  { border-color: var(--gold); background: #fefdf5; }
+.kanji-card.is-review .status-btn.review-btn { background:var(--gold); color:white; border-color:var(--gold); }
+.grammar-card.is-review { border-color: var(--gold); background: #fefdf5; }
+.grammar-card.is-review .status-btn.review-btn { background:var(--gold); color:white; border-color:var(--gold); }
+/* mastered stamp on vocab card */
+.mastered-stamp {
+  position:absolute; top:9px; left:10px;
+  font-size:.58rem; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--green); font-weight:600; display:none;
+}
+.is-mastered .mastered-stamp { display:block; }
+.review-stamp {
+  position:absolute; top:9px; left:10px;
+  font-size:.58rem; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--gold); font-weight:600; display:none;
+}
+.is-review .review-stamp { display:block; }
+.empty { text-align: center; padding: 50px 20px; color: var(--grey); font-size: .84rem; }
+.empty .big { font-family: 'Shippori Mincho', serif; font-size: 2.8rem; margin-bottom: 10px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--paper2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+@media (max-width: 600px) {
+  .q-main { font-size: 1.4rem; }
+  main { padding: 18px 13px 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH OVERLAY ══ -->
+<div id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">日本語 <span>JLPT</span></div>
+    <div class="auth-sub">Sign in to sync your progress</div>
+    <div class="auth-err" id="auth-err"></div>
+    <input class="auth-inp" id="auth-email" type="email" placeholder="Email" onkeydown="if(event.key==='Enter')authSubmit()">
+    <input class="auth-inp" id="auth-pass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')authSubmit()">
+    <button class="btn" style="width:100%;margin-top:4px" onclick="authSubmit()" id="auth-btn">Sign in</button>
+    <div class="auth-switch" id="auth-switch-text">
+      No account? <a onclick="authToggleMode()">Create one</a>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div>
+    <div class="logo">日本語 <span>JLPT</span> 練習</div>
+    <div class="logo-sub">N4 · N5 · Miyuki sensei sessions</div>
+  </div>
+  <div id="auth-user-bar">
+    <span><span class="sync-dot" id="sync-dot"></span><span id="sync-label">—</span></span>
+    <a onclick="authSignOut()">Sign out</a>
+  </div>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showPage('dashboard',this)">🏠 Home</button>
+  <button class="tab" onclick="showPage('vocab',this)">📖 Vocab</button>
+  <button class="tab" onclick="showPage('grammar',this)">文 Grammar</button>
+  <button class="tab" onclick="showPage('kanji',this)">漢 Kanji</button>
+  <button class="tab" onclick="showPage('quiz',this)">✏️ Quiz</button>
+  <button class="tab" onclick="showPage('reading',this)">📄 Reading</button>
+  <button class="tab" onclick="showPage('katakana',this)">ア Katakana</button>
+</nav>
+
+<main>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="page-dashboard" class="page active">
+  <div class="page-title">おはようございます！ <em>いっしょにがんばりましょう。</em></div>
+  <div class="page-desc">Your complete N4 / N5 revision hub — all lessons with Miyuki sensei.</div>
+  <div class="stats-row" id="stats-row"></div>
+  <h2 class="section-h">Lessons covered</h2>
+  <div class="lesson-grid" id="lesson-grid"></div>
+</div>
+
+<!-- ══ VOCAB ══ -->
+<div id="page-vocab" class="page">
+  <div class="page-title">単語 <em>Vocabulary</em></div>
+  <div class="page-desc">Tap a card to reveal its meaning. Filter by lesson, type, or search.</div>
+  <div class="filter-bar">
+    <input type="text" id="v-search" placeholder="Search kana, kanji or meaning…" oninput="renderVocab()">
+    <select id="v-lesson" onchange="renderVocab()"><option value="">All lessons</option></select>
+    <select id="v-type" onchange="renderVocab()">
+      <option value="">All types</option>
+      <option value="verb">Verbs</option>
+      <option value="adj">Adjectives</option>
+      <option value="noun">Nouns</option>
+      <option value="other">Other</option>
+    </select>
+    <select id="v-status" onchange="renderVocab()">
+      <option value="">All cards</option>
+      <option value="review">🔁 Review again</option>
+      <option value="mastered">✓ Mastered</option>
+    </select>
+    <span class="count-badge" id="v-count"></span>
+  </div>
+  <div class="vocab-grid" id="vocab-grid"></div>
+</div>
+
+<!-- ══ GRAMMAR ══ -->
+<div id="page-grammar" class="page">
+  <div class="page-title">文法 <em>Grammar</em></div>
+  <div class="page-desc">N5 and N4 grammar patterns with formation rules and examples from your lessons.</div>
+  <div class="filter-bar">
+    <input type="text" id="g-search" placeholder="Search pattern or meaning…" oninput="renderGrammar()">
+    <select id="g-level" onchange="renderGrammar()">
+      <option value="">All levels</option>
+      <option value="N5">N5</option>
+      <option value="N4">N4</option>
+    </select>
+    <select id="g-lesson" onchange="renderGrammar()"><option value="">All lessons</option></select>
+    <select id="g-status" onchange="renderGrammar()">
+      <option value="">All cards</option>
+      <option value="review">🔁 Review again</option>
+      <option value="mastered">✓ Mastered</option>
+    </select>
+    <span class="count-badge" id="g-count"></span>
+  </div>
+  <div class="grammar-list" id="grammar-list"></div>
+</div>
+
+<!-- ══ KANJI ══ -->
+<div id="page-kanji" class="page">
+  <div class="page-title">漢字 <em>Kanji</em></div>
+  <div class="page-desc">All N5 kanji + N4 kanji from your lessons. Tap a card to reveal meaning.</div>
+  <div class="filter-bar">
+    <input type="text" id="k-search" placeholder="Search kanji, reading or meaning…" oninput="renderKanji()">
+    <select id="k-level" onchange="renderKanji()">
+      <option value="">All levels</option>
+      <option value="N5">N5</option>
+      <option value="N4">N4 (from lessons)</option>
+    </select>
+    <select id="k-status" onchange="renderKanji()">
+      <option value="">All cards</option>
+      <option value="review">🔁 Review again</option>
+      <option value="mastered">✓ Mastered</option>
+    </select>
+    <span class="count-badge" id="k-count"></span>
+  </div>
+  <div class="kanji-grid" id="kanji-grid"></div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="page-quiz" class="page">
+  <div class="page-title">練習 <em>Quiz</em></div>
+  <div class="page-desc">Test yourself. All answers in kana (hiragana / katakana).</div>
+
+  <div id="qz-setup">
+    <div class="quiz-setup">
+      <h3>クイズをはじめましょう</h3>
+      <div class="opt-group">
+        <span class="opt-label">Quiz mode</span>
+        <div class="pill-group" id="qz-mode-pills">
+          <label class="pill on" data-val="kana-meaning"><input type="checkbox" value="kana-meaning" checked>Kana → Meaning</label>
+          <label class="pill" data-val="meaning-kana"><input type="checkbox" value="meaning-kana">Meaning → Kana</label>
+          <label class="pill" data-val="kanji-kana"><input type="checkbox" value="kanji-kana">Kanji → Reading</label>
+          <label class="pill" data-val="grammar"><input type="checkbox" value="grammar">Grammar fill-in</label>
+        </div>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">Content</span>
+        <div class="pill-group" id="qz-lesson-pills"></div>
+      </div>
+      <div class="opt-group">
+        <span class="opt-label">Number of questions</span>
+        <div class="pill-group" id="qz-num-pills">
+          <label class="pill on-blue" data-num="10"><input type="radio" name="qnum">10</label>
+          <label class="pill" data-num="20"><input type="radio" name="qnum">20</label>
+          <label class="pill" data-num="30"><input type="radio" name="qnum">30</label>
+          <label class="pill" data-num="all"><input type="radio" name="qnum">All</label>
+        </div>
+      </div>
+      <button class="btn" onclick="startQuiz()">Start →</button>
+    </div>
+  </div>
+
+  <div id="qz-active" style="display:none">
+    <div class="quiz-wrap">
+      <div class="quiz-top">
+        <span class="quiz-ctr" id="qz-ctr"></span>
+        <button class="btn outline" style="padding:6px 13px;font-size:.7rem;" onclick="endQuiz()">✕ End</button>
+      </div>
+      <div class="dots" id="qz-dots"></div>
+      <div class="q-card">
+        <div class="q-lbl" id="q-lbl"></div>
+        <div class="q-main" id="q-main"></div>
+        <div class="q-sub" id="q-sub"></div>
+        <div class="q-mode-badge" id="q-badge"></div>
+      </div>
+      <input class="quiz-inp" type="text" id="qz-inp" placeholder="ひらがなでこたえてください…" onkeydown="if(event.key==='Enter')checkAns()">
+      <div class="feedback" id="qz-fb"></div>
+      <div class="quiz-btns">
+        <button class="btn" id="btn-check" onclick="checkAns()">確認 Check</button>
+        <button class="btn outline" id="btn-skip" onclick="skipQ()">Skip</button>
+        <button class="btn green-btn" id="btn-next" onclick="nextQ()" style="display:none">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="qz-score" style="display:none">
+    <div class="score-card">
+      <div class="score-big" id="sc-big"></div>
+      <div class="score-lbl">correct answers</div>
+      <div class="score-msg" id="sc-msg"></div>
+      <div class="wrong-list" id="sc-wrong"></div>
+      <div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap">
+        <button class="btn" onclick="startQuiz()">Try again</button>
+        <button class="btn outline" onclick="backToSetup()">New quiz</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ READING ══ -->
+<div id="page-reading" class="page">
+  <div class="page-title">読解 <em>Reading</em></div>
+  <div class="page-desc">Short passages from your lesson materials with comprehension questions.</div>
+  <div id="reading-list"></div>
+</div>
+
+<!-- ══ KATAKANA ══ -->
+<div id="page-katakana" class="page">
+  <div class="page-title">カタカナ <em>Katakana Drill</em></div>
+  <div class="page-desc">Master your weakest alphabet. Four modes — chart, multiple choice, type-in, and speed drill.</div>
+
+  <div class="kt-mode-bar">
+    <button class="kt-mode-btn active" onclick="ktSetMode('chart',this)">📋 Chart</button>
+    <button class="kt-mode-btn" onclick="ktSetMode('tricky',this)">⚠️ Tricky Pairs</button>
+    <button class="kt-mode-btn" onclick="ktSetMode('choice',this)">🎯 Multiple Choice</button>
+    <button class="kt-mode-btn" onclick="ktSetMode('type',this)">⌨️ Type-in</button>
+    <button class="kt-mode-btn" onclick="ktSetMode('speed',this)">⚡ Speed Drill</button>
+  </div>
+
+  <!-- CHART -->
+  <div id="kt-panel-chart">
+    <h2 class="section-h">Full Katakana Chart</h2>
+    <div class="page-desc">Hover to see romanisation. Red = commonly confused characters.</div>
+    <div class="kt-chart" id="kt-chart-grid"></div>
+  </div>
+
+  <!-- TRICKY PAIRS -->
+  <div id="kt-panel-tricky" style="display:none">
+    <h2 class="section-h">⚠️ Commonly Confused Characters</h2>
+    <div class="page-desc">These are the ones that trip up most learners. Study them carefully before drilling.</div>
+    <div class="tricky-pairs" id="kt-tricky-pairs"></div>
+    <div style="margin-top:8px"><button class="btn" onclick="ktSetMode('choice',document.querySelector('.kt-mode-btn:nth-child(3)'))">Drill these now →</button></div>
+  </div>
+
+  <!-- MULTIPLE CHOICE -->
+  <div id="kt-panel-choice" style="display:none">
+    <div class="kt-drill-wrap">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="kt-mode-btn active" id="kt-dir-btn" onclick="ktToggleDir()">ア → romaji</button>
+        <button class="kt-mode-btn" id="kt-tricky-only-btn" onclick="ktToggleTrickyOnly()">All chars</button>
+      </div>
+      <div class="kt-score-bar">
+        <span>✓ <span class="sn ok-n" id="kt-ok-mc">0</span></span>
+        <span>✗ <span class="sn bad-n" id="kt-bad-mc">0</span></span>
+        <span style="margin-left:auto;font-size:.7rem" id="kt-q-ctr-mc"></span>
+      </div>
+      <div class="kt-card">
+        <div class="kt-hint-txt" id="kt-lbl-mc">What is this?</div>
+        <div class="kt-prompt" id="kt-prompt-mc"></div>
+      </div>
+      <div class="kt-options" id="kt-options-mc"></div>
+      <div style="text-align:center;margin-top:4px">
+        <button class="btn outline" style="font-size:.72rem;padding:7px 16px" onclick="ktStartChoice()">↺ Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TYPE-IN -->
+  <div id="kt-panel-type" style="display:none">
+    <div class="kt-drill-wrap">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="kt-mode-btn active" id="kt-dir-type-btn" onclick="ktToggleDirType()">ア → romaji</button>
+        <button class="kt-mode-btn" id="kt-tricky-type-btn" onclick="ktToggleTrickyType()">All chars</button>
+      </div>
+      <div class="kt-score-bar">
+        <span>✓ <span class="sn ok-n" id="kt-ok-type">0</span></span>
+        <span>✗ <span class="sn bad-n" id="kt-bad-type">0</span></span>
+        <span style="margin-left:auto;font-size:.7rem" id="kt-q-ctr-type"></span>
+      </div>
+      <div class="kt-card">
+        <div class="kt-hint-txt" id="kt-lbl-type">Type the romanisation</div>
+        <div class="kt-prompt" id="kt-prompt-type"></div>
+      </div>
+      <input class="kt-type-inp" id="kt-inp-type" placeholder="type here…" onkeydown="if(event.key==='Enter')ktCheckType()">
+      <div class="kt-feedback" id="kt-fb-type"></div>
+      <div style="display:flex;gap:9px;justify-content:center">
+        <button class="btn" id="kt-check-type" onclick="ktCheckType()">Check</button>
+        <button class="btn green-btn" id="kt-next-type" onclick="ktNextType()" style="display:none">Next →</button>
+        <button class="btn outline" style="font-size:.72rem;padding:7px 16px" onclick="ktStartType()">↺ Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEED DRILL -->
+  <div id="kt-panel-speed" style="display:none">
+    <div class="kt-drill-wrap">
+      <div id="kt-speed-setup">
+        <div style="background:white;border:1.5px solid var(--border);border-radius:12px;padding:24px;max-width:400px;box-shadow:var(--shadow)">
+          <h3 style="font-family:'Shippori Mincho',serif;font-size:1.2rem;margin-bottom:16px">⚡ Speed Drill</h3>
+          <p style="font-size:.82rem;color:var(--grey);margin-bottom:16px;line-height:1.6">Answer as fast as you can. You have <strong>3 seconds</strong> per character. Miss the timer = wrong!</p>
+          <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+            <label class="pill on" id="sp-all-pill" onclick="ktSpToggle('all',this)"><input type="radio" name="spset">All (46)</label>
+            <label class="pill" id="sp-tricky-pill" onclick="ktSpToggle('tricky',this)"><input type="radio" name="spset">Tricky only</label>
+          </div>
+          <button class="btn" onclick="ktStartSpeed()">Start ⚡</button>
+        </div>
+      </div>
+      <div id="kt-speed-active" style="display:none">
+        <div class="kt-score-bar">
+          <span>✓ <span class="sn ok-n" id="kt-ok-sp">0</span></span>
+          <span>✗ <span class="sn bad-n" id="kt-bad-sp">0</span></span>
+          <span style="margin-left:auto;font-size:.7rem" id="kt-q-ctr-sp"></span>
+        </div>
+        <div class="kt-timer-bar"><div class="kt-timer-fill" id="kt-timer-fill" style="width:100%"></div></div>
+        <div class="kt-card">
+          <div class="kt-hint-txt">Quick! What's the romanisation?</div>
+          <div class="kt-prompt" id="kt-prompt-sp"></div>
+        </div>
+        <input class="kt-type-inp" id="kt-inp-sp" placeholder="type fast!" onkeydown="if(event.key==='Enter')ktCheckSpeed()">
+        <div class="kt-feedback" id="kt-fb-sp"></div>
+        <div style="display:flex;gap:9px;justify-content:center">
+          <button class="btn" id="kt-check-sp" onclick="ktCheckSpeed()">Check</button>
+          <button class="btn green-btn" id="kt-next-sp" onclick="ktNextSpeed()" style="display:none">Next →</button>
+          <button class="btn outline" style="font-size:.72rem;padding:7px 16px" onclick="ktEndSpeed()">✕ End</button>
+        </div>
+      </div>
+      <div id="kt-speed-score" style="display:none">
+        <div class="score-card">
+          <div class="score-big" id="sp-big"></div>
+          <div class="score-lbl">correct answers</div>
+          <div class="score-msg" id="sp-msg"></div>
+          <div style="display:flex;gap:9px;justify-content:center">
+            <button class="btn" onclick="ktStartSpeed()">Try again</button>
+            <button class="btn outline" onclick="ktEndSpeed()">Setup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — LESSONS
+// ═══════════════════════════════════════════════════════════
+const LESSONS = {
+  N5:  { title:"N5 Core Grammar & Vocab",       date:"Ongoing",        level:"N5" },
+  L43: { title:"Plain Form / つもりです・そうです", date:"Jan 2026",       level:"N4" },
+  L44: { title:"やすい・にくい・すぎます・にとって",   date:"Jan–Feb 2026",   level:"N4" },
+  L45: { title:"場合は・のに・ところです",            date:"Feb–Mar 2026",   level:"N4" },
+  L46: { title:"ばかりです・てすみません",             date:"Mar 2026",       level:"N4" },
+};
+
+// ═══════════════════════════════════════════════════════════
+// DATA — GRAMMAR (N5 complete + N4 from lessons)
+// ═══════════════════════════════════════════════════════════
+const GRAMMAR = [
+  // ─── N5 ───
+  { id:"g01", level:"N5", lesson:"N5", pattern:"～は～です",        meaning:"A is B (copula, present affirmative)",
+    formation:"Noun + は + Noun/Adj + です",
+    examples:[{jp:"わたしはがくせいです。",en:"I am a student."},{jp:"これはほんです。",en:"This is a book."}] },
+  { id:"g02", level:"N5", lesson:"N5", pattern:"～は～ではありません", meaning:"A is not B (negative copula)",
+    formation:"Noun + は + Noun + では（じゃ）ありません",
+    examples:[{jp:"これはざっしではありません。",en:"This is not a magazine."},{jp:"やまださんはせんせいじゃないです。",en:"Yamada-san is not a teacher."}] },
+  { id:"g03", level:"N5", lesson:"N5", pattern:"～ますか／～ません",  meaning:"Polite verb present/future (Q & negative)",
+    formation:"V-ます form / V-ません",
+    examples:[{jp:"まいにちにほんごをべんきょうしますか。",en:"Do you study Japanese every day?"},{jp:"きょうはいきません。",en:"I will not go today."}] },
+  { id:"g04", level:"N5", lesson:"N5", pattern:"～をください",       meaning:"Please give me ~",
+    formation:"Noun + をください",
+    examples:[{jp:"みずをください。",en:"Please give me water."},{jp:"そのほんをください。",en:"Please give me that book."}] },
+  { id:"g05", level:"N5", lesson:"N5", pattern:"～に～があります／います", meaning:"There is ~ at / in ~ (exist)",
+    formation:"Place + に + Noun + が + あります（things）/ います（people/animals）",
+    examples:[{jp:"つくえのうえにほんがあります。",en:"There is a book on the desk."},{jp:"こうえんにこどもがいます。",en:"There are children in the park."}] },
+  { id:"g06", level:"N5", lesson:"N5", pattern:"～でいきます",       meaning:"Go by (means of transport)",
+    formation:"Transport + で + いきます／きます／かえります",
+    examples:[{jp:"でんしゃでいきます。",en:"I go by train."},{jp:"くるまできました。",en:"I came by car."}] },
+  { id:"g07", level:"N5", lesson:"N5", pattern:"～てください",       meaning:"Please do ~ (polite request)",
+    formation:"V-て form + ください",
+    examples:[{jp:"まってください。",en:"Please wait."},{jp:"ゆっくりはなしてください。",en:"Please speak slowly."}] },
+  { id:"g08", level:"N5", lesson:"N5", pattern:"～てもいいです",     meaning:"It is OK / you may ~",
+    formation:"V-て form + もいいですか",
+    examples:[{jp:"ここにすわってもいいですか。",en:"May I sit here?"},{jp:"しゃしんをとってもいいですよ。",en:"You may take photos."}] },
+  { id:"g09", level:"N5", lesson:"N5", pattern:"～てはいけません",   meaning:"You must not ~",
+    formation:"V-て form + はいけません",
+    examples:[{jp:"ここでたばこをすってはいけません。",en:"You must not smoke here."},{jp:"じゅぎょうちゅうにしゃべってはいけません。",en:"You must not talk during class."}] },
+  { id:"g10", level:"N5", lesson:"N5", pattern:"～ています",        meaning:"Currently doing / ongoing state",
+    formation:"V-て form + います",
+    examples:[{jp:"いまごはんをたべています。",en:"I am eating now."},{jp:"やまださんはけっこんしています。",en:"Yamada-san is married."}] },
+  { id:"g11", level:"N5", lesson:"N5", pattern:"～たことがあります", meaning:"Have (ever) done ~",
+    formation:"V-た form + ことがあります",
+    examples:[{jp:"にほんへいったことがあります。",en:"I have been to Japan."},{jp:"すしをたべたことがありますか。",en:"Have you ever eaten sushi?"}] },
+  { id:"g12", level:"N5", lesson:"N5", pattern:"～たり～たりします", meaning:"Do things like A and B (non-exhaustive list)",
+    formation:"V-た + り、V-た + り + します",
+    examples:[{jp:"しゅうまつはほんをよんだり、えいがをみたりします。",en:"On weekends I do things like reading books and watching films."},{jp:"ごろごろしたり、かいものをしたりしました。",en:"I lazed around and went shopping."}] },
+  { id:"g13", level:"N5", lesson:"N5", pattern:"～ながら",          meaning:"While doing ~ (simultaneous actions)",
+    formation:"V-ます stem + ながら",
+    examples:[{jp:"おんがくをききながら、べんきょうします。",en:"I study while listening to music."},{jp:"あるきながら、スマホをみないでください。",en:"Please don't look at your phone while walking."}] },
+  { id:"g14", level:"N5", lesson:"N5", pattern:"～てから",          meaning:"After doing ~",
+    formation:"V-て form + から",
+    examples:[{jp:"てをあらってから、たべます。",en:"I eat after washing my hands."},{jp:"しごとがおわってから、のみにいきます。",en:"After work finishes, I'll go for a drink."}] },
+  { id:"g15", level:"N5", lesson:"N5", pattern:"～ほうがいいです",  meaning:"It's better to ~",
+    formation:"V-た + ほうがいいです（affirmative）\nV-ない + ほうがいいです（negative）",
+    examples:[{jp:"はやくいったほうがいいですよ。",en:"You'd better go early."},{jp:"たばこはすわないほうがいいです。",en:"It's better not to smoke."}] },
+  { id:"g16", level:"N5", lesson:"N5", pattern:"～つもりです",      meaning:"Plan / intend to ~",
+    formation:"V-dictionary form + つもりです\nV-ない form + つもりです（negative intention）",
+    examples:[{jp:"らいねんにほんにいくつもりです。",en:"I plan to go to Japan next year."},{jp:"けっこんしないつもりです。",en:"I don't intend to get married."}] },
+  { id:"g17", level:"N5", lesson:"N5", pattern:"～と思っています",  meaning:"I think / I'm thinking of",
+    formation:"V-plain / S-plain + とおもっています",
+    examples:[{jp:"うんどうをしようとおもっています。",en:"I'm thinking of exercising."},{jp:"にほんごはむずかしいとおもいます。",en:"I think Japanese is difficult."}] },
+  { id:"g18", level:"N5", lesson:"N5", pattern:"～でしょう",        meaning:"Probably / I suppose (conjecture)",
+    formation:"plain form + でしょう",
+    examples:[{jp:"あしたはあめでしょう。",en:"It will probably rain tomorrow."},{jp:"かれはもうきたでしょう。",en:"He's probably already come."}] },
+  { id:"g19", level:"N5", lesson:"N5", pattern:"～かもしれません",  meaning:"Might / may ~",
+    formation:"V-plain / Adj-plain / Noun + かもしれません",
+    examples:[{jp:"あしたあめかもしれません。",en:"It might rain tomorrow."},{jp:"かれはしらないかもしれません。",en:"He might not know."}] },
+  { id:"g20", level:"N5", lesson:"N5", pattern:"～なければなりません", meaning:"Must / have to ~",
+    formation:"V-ない form (drop ない) + なければなりません\nshort form: ～なきゃ",
+    examples:[{jp:"くすりをのまなければなりません。",en:"I must take medicine."},{jp:"はやくかえらなければなりません。",en:"I have to go home early."}] },
+  { id:"g21", level:"N5", lesson:"N5", pattern:"～なくてもいいです", meaning:"Don't need to / it's OK not to",
+    formation:"V-ない form + なくてもいいです",
+    examples:[{jp:"きょうはこなくてもいいです。",en:"You don't need to come today."},{jp:"むりしなくてもいいですよ。",en:"You don't have to push yourself."}] },
+  { id:"g22", level:"N5", lesson:"N5", pattern:"いちばん～",        meaning:"Most ~ / the most",
+    formation:"いちばん + Adj",
+    examples:[{jp:"にほんごがいちばんむずかしいです。",en:"Japanese is the hardest."},{jp:"なにがいちばんすきですか。",en:"What do you like most?"}] },
+  { id:"g23", level:"N5", lesson:"N5", pattern:"～より～のほうが",  meaning:"~ is more ~ than ~",
+    formation:"A + より + B + のほうが + Adj",
+    examples:[{jp:"でんしゃよりひこうきのほうがはやいです。",en:"Planes are faster than trains."},{jp:"なつよりふゆのほうがすきです。",en:"I prefer winter to summer."}] },
+  { id:"g24", level:"N5", lesson:"N5", pattern:"～と～とどちらが",  meaning:"Which is more ~ A or B?",
+    formation:"A + と + B + とどちらが + Adj + ですか",
+    examples:[{jp:"すしとてんぷらとどちらがすきですか。",en:"Which do you prefer, sushi or tempura?"},{jp:"にほんとちゅうごくとどちらがおおきいですか。",en:"Which is bigger, Japan or China?"}] },
+  { id:"g25", level:"N5", lesson:"N5", pattern:"～ので",           meaning:"Because ~ / since ~ (soft reason)",
+    formation:"V-plain / Adj-plain / Noun + な + ので",
+    examples:[{jp:"かぜなので、やすみます。",en:"I'll rest because I have a cold."},{jp:"あめがふっているので、いえにいます。",en:"I'm at home because it's raining."}] },
+  { id:"g26", level:"N5", lesson:"N5", pattern:"～から",           meaning:"Because ~ (direct reason / therefore)",
+    formation:"V-plain / Adj + から",
+    examples:[{jp:"たかいから、かいません。",en:"I won't buy it because it's expensive."},{jp:"つかれたから、はやくねます。",en:"I'll sleep early because I'm tired."}] },
+  { id:"g27", level:"N5", lesson:"N5", pattern:"もし～たら",       meaning:"If ~ (conditional, hypothetical)",
+    formation:"もし + V-たら / Adj-たら / Noun + だったら",
+    examples:[{jp:"もしあめがふったら、いきません。",en:"If it rains, I won't go."},{jp:"もしじかんがあったら、てつだいます。",en:"If I have time, I'll help."}] },
+  { id:"g28", level:"N5", lesson:"N5", pattern:"～たら",           meaning:"When / if (conditional)",
+    formation:"V-た form + ら",
+    examples:[{jp:"しゅくだいがおわったら、あそびましょう。",en:"Let's play when homework is finished."},{jp:"くににかえったら、れんらくします。",en:"I'll contact you when I return to my country."}] },
+  { id:"g29", level:"N5", lesson:"N5", pattern:"～でも",           meaning:"Even / even if",
+    formation:"Noun + でも",
+    examples:[{jp:"だれでもできます。",en:"Anyone can do it."},{jp:"なんでもたべます。",en:"I eat anything."}] },
+  { id:"g30", level:"N5", lesson:"N5", pattern:"～前に",           meaning:"Before doing ~",
+    formation:"V-dictionary + まえに / Noun + の + まえに",
+    examples:[{jp:"ねるまえに、はをみがきます。",en:"I brush my teeth before sleeping."},{jp:"しょくじのまえに、てをあらいます。",en:"I wash my hands before eating."}] },
+  { id:"g31", level:"N5", lesson:"N5", pattern:"～後で",           meaning:"After doing ~",
+    formation:"V-た form + あとで / Noun + の + あとで",
+    examples:[{jp:"しょくじのあとで、コーヒーをのみます。",en:"I drink coffee after a meal."},{jp:"しごとがおわったあとで、かえります。",en:"I'll go home after work finishes."}] },
+  { id:"g32", level:"N5", lesson:"N5", pattern:"～とき",           meaning:"When ~ (a time/situation)",
+    formation:"V-plain / Adj / Noun + の + とき",
+    examples:[{jp:"こまったとき、でんわしてください。",en:"Please call when you're in trouble."},{jp:"こどものとき、よくおよぎました。",en:"When I was a child, I often swam."}] },
+  // ─── N4 L43 ───
+  { id:"g33", level:"N4", lesson:"L43", pattern:"そうです（見た目）",  meaning:"Looks like ~ / seems ~ (appearance-based)",
+    formation:"V-ます stem + そうです\ni-adj (drop い) + そうです\nな-adj + そうです",
+    examples:[{jp:"ボタンがはずれそうです。",en:"The button looks like it will come undone."},{jp:"このりょうりはおいしそうです。",en:"This dish looks delicious."},{jp:"あのひとはやさしそうです。",en:"That person seems kind."}] },
+  { id:"g34", level:"N4", lesson:"L43", pattern:"そうです（伝聞）",    meaning:"I heard that ~ / apparently ~ (hearsay)",
+    formation:"V-plain / Adj-plain / Noun + そうです",
+    examples:[{jp:"あしたあめがふるそうです。",en:"I heard it will rain tomorrow."},{jp:"たなかさんはけっこんしたそうです。",en:"I heard Tanaka-san got married."}] },
+  { id:"g35", level:"N4", lesson:"L43", pattern:"～らしい",           meaning:"Apparently ~ / it seems ~ (evidence-based)",
+    formation:"V-plain / Adj-plain / Noun + らしい",
+    examples:[{jp:"あのみせはやすいらしいです。",en:"That shop is apparently cheap."},{jp:"かれはびょうきらしいです。",en:"He apparently is ill."}] },
+  { id:"g36", level:"N4", lesson:"L43", pattern:"～ようです",          meaning:"It appears that ~ / it seems that ~",
+    formation:"V-plain / Adj / Noun + の + ようです",
+    examples:[{jp:"かれはこないようです。",en:"It seems he won't come."},{jp:"このまちはしずかなようです。",en:"This town seems quiet."}] },
+  // ─── N4 L44 ───
+  { id:"g37", level:"N4", lesson:"L44", pattern:"V-ます + やすい",    meaning:"Easy to ~ / tends to ~",
+    formation:"V-ます stem + やすい（conjugates as i-adj）\nyasuku narimasu for change form",
+    examples:[{jp:"このスマホはつかいやすいです。",en:"This smartphone is easy to use."},{jp:"やまというかんじはおぼえやすいです。",en:"The kanji 山 is easy to remember."},{jp:"としをとると、かみもぬけやすくなります。",en:"As you get older, your hair falls out more easily."}] },
+  { id:"g38", level:"N4", lesson:"L44", pattern:"V-ます + にくい",    meaning:"Difficult to ~ / hard to ~",
+    formation:"V-ます stem + にくい（conjugates as i-adj）",
+    examples:[{jp:"このかんじはおぼえにくいです。",en:"This kanji is hard to remember."},{jp:"このくつはあるきにくいです。",en:"These shoes are hard to walk in."},{jp:"じょうしにはそうだんしにくいです。",en:"It's hard to consult my boss."}] },
+  { id:"g39", level:"N4", lesson:"L44", pattern:"～すぎます",          meaning:"Too much ~ / excessively ~",
+    formation:"V-ます stem + すぎます\ni-adj (drop い) + すぎます\nな-adj + すぎます",
+    examples:[{jp:"たべすぎて、おなかがいたいです。",en:"I ate too much and my stomach hurts."},{jp:"このもんだいはかんたんすぎます。",en:"This question is too easy."},{jp:"はたらきすぎないでください。",en:"Please don't overwork yourself."}] },
+  { id:"g40", level:"N4", lesson:"L44", pattern:"～にとって",          meaning:"For ~ / from ~'s perspective",
+    formation:"Noun + にとって",
+    examples:[{jp:"わたしにとって、にほんごはむずかしいです。",en:"For me, Japanese is difficult."},{jp:"しょしんしゃにとってつかいやすいカメラです。",en:"It's a camera that is easy to use for beginners."}] },
+  // ─── N4 L45 ───
+  { id:"g41", level:"N4", lesson:"L45", pattern:"～場合は",           meaning:"In the case of ~ / if (formal/written)",
+    formation:"V-plain + ばあいは\nNoun の + ばあいは\nな-adj + な + ばあいは\ni-adj + ばあいは",
+    examples:[{jp:"かじのばあいは、１１９ばんにでんわしてください。",en:"In case of fire, call 119."},{jp:"じしんのばあいは、エレベーターをつかわないでください。",en:"In case of earthquake, don't use the lift."},{jp:"ひつようなばあいは、じぶんでコピーしてください。",en:"If necessary, copy it yourself."}] },
+  { id:"g42", level:"N4", lesson:"L45", pattern:"～のに",             meaning:"Even though ~ (surprise / disappointment)",
+    formation:"V-plain + のに\nNoun / な-adj + なのに\ni-adj-plain + のに",
+    examples:[{jp:"べんきょうしたのに、しけんにおちました。",en:"Even though I studied, I failed the exam."},{jp:"たかいコースなのに、おいしくなかったです。",en:"Despite being an expensive course, it wasn't tasty."},{jp:"びょうきなのに、はたらいています。",en:"Even though they're sick, they're working."}] },
+  { id:"g43", level:"N4", lesson:"L45", pattern:"～ところです",        meaning:"Just about to / in the middle of / just finished",
+    formation:"V-dictionary + ところです（about to start）\nV-て + いる + ところです（right in the middle of）\nV-た + ところです（just finished）",
+    examples:[{jp:"ちょうどいまからしあいがはじまるところです。",en:"The match is just about to start."},{jp:"いまばんごはんをたべているところです。",en:"I'm in the middle of eating dinner."},{jp:"いまとうきょうについたところです。",en:"I just arrived in Tokyo."}] },
+  // ─── N4 L46 ───
+  { id:"g44", level:"N4", lesson:"L46", pattern:"V-た + ばかりです",  meaning:"Just did ~ (very recently completed)",
+    formation:"V-た form + ばかりです",
+    examples:[{jp:"にほんにきたばかりです。",en:"I just came to Japan."},{jp:"このまちにひっこしたばかりです。",en:"I just moved to this town."},{jp:"さっきごはんをたべたばかりです。",en:"I just ate a little while ago."}] },
+  { id:"g45", level:"N4", lesson:"L46", pattern:"～てすみません",     meaning:"I'm sorry for ~ing",
+    formation:"V-て form + すみません",
+    examples:[{jp:"おそくなってすみません。",en:"I'm sorry for being late."},{jp:"めいわくをかけてすみません。",en:"I'm sorry for the trouble."}] },
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — KANJI
+// ═══════════════════════════════════════════════════════════
+const KANJI = [
+  // ── N5 (80 kanji) ──
+  {ch:"日",on:"ニチ・ジツ",kun:"ひ・か",meaning:"sun / day",level:"N5",strokes:4},
+  {ch:"月",on:"ゲツ・ガツ",kun:"つき",meaning:"moon / month",level:"N5",strokes:4},
+  {ch:"火",on:"カ",kun:"ひ",meaning:"fire",level:"N5",strokes:4},
+  {ch:"水",on:"スイ",kun:"みず",meaning:"water",level:"N5",strokes:4},
+  {ch:"木",on:"モク・ボク",kun:"き",meaning:"tree / wood",level:"N5",strokes:4},
+  {ch:"金",on:"キン・コン",kun:"かね・かな",meaning:"gold / money",level:"N5",strokes:8},
+  {ch:"土",on:"ド・ト",kun:"つち",meaning:"earth / soil",level:"N5",strokes:3},
+  {ch:"山",on:"サン",kun:"やま",meaning:"mountain",level:"N5",strokes:3},
+  {ch:"川",on:"セン",kun:"かわ",meaning:"river",level:"N5",strokes:3},
+  {ch:"田",on:"デン",kun:"た",meaning:"rice field",level:"N5",strokes:5},
+  {ch:"天",on:"テン",kun:"あめ・あま",meaning:"heaven / sky",level:"N5",strokes:4},
+  {ch:"空",on:"クウ",kun:"そら・あ(く)",meaning:"sky / empty",level:"N5",strokes:8},
+  {ch:"雨",on:"ウ",kun:"あめ・あま",meaning:"rain",level:"N5",strokes:8},
+  {ch:"花",on:"カ",kun:"はな",meaning:"flower",level:"N5",strokes:7},
+  {ch:"草",on:"ソウ",kun:"くさ",meaning:"grass",level:"N5",strokes:9},
+  {ch:"林",on:"リン",kun:"はやし",meaning:"grove / forest",level:"N5",strokes:8},
+  {ch:"森",on:"シン",kun:"もり",meaning:"forest",level:"N5",strokes:12},
+  {ch:"人",on:"ジン・ニン",kun:"ひと",meaning:"person",level:"N5",strokes:2},
+  {ch:"男",on:"ダン・ナン",kun:"おとこ",meaning:"man",level:"N5",strokes:7},
+  {ch:"女",on:"ジョ・ニョ",kun:"おんな",meaning:"woman",level:"N5",strokes:3},
+  {ch:"子",on:"シ・ス",kun:"こ",meaning:"child",level:"N5",strokes:3},
+  {ch:"父",on:"フ",kun:"ちち",meaning:"father",level:"N5",strokes:4},
+  {ch:"母",on:"ボ",kun:"はは",meaning:"mother",level:"N5",strokes:5},
+  {ch:"友",on:"ユウ",kun:"とも",meaning:"friend",level:"N5",strokes:4},
+  {ch:"先",on:"セン",kun:"さき",meaning:"ahead / former",level:"N5",strokes:6},
+  {ch:"生",on:"セイ・ショウ",kun:"い(きる)・う(まれる)",meaning:"life / birth",level:"N5",strokes:5},
+  {ch:"学",on:"ガク",kun:"まな(ぶ)",meaning:"study / learning",level:"N5",strokes:8},
+  {ch:"校",on:"コウ",kun:"",meaning:"school",level:"N5",strokes:10},
+  {ch:"年",on:"ネン",kun:"とし",meaning:"year",level:"N5",strokes:6},
+  {ch:"時",on:"ジ",kun:"とき",meaning:"time / hour",level:"N5",strokes:10},
+  {ch:"分",on:"フン・ブン",kun:"わ(かる)・わ(ける)",meaning:"minute / portion",level:"N5",strokes:4},
+  {ch:"半",on:"ハン",kun:"なか(ば)",meaning:"half",level:"N5",strokes:5},
+  {ch:"毎",on:"マイ",kun:"",meaning:"every",level:"N5",strokes:6},
+  {ch:"週",on:"シュウ",kun:"",meaning:"week",level:"N5",strokes:11},
+  {ch:"今",on:"コン・キン",kun:"いま",meaning:"now",level:"N5",strokes:4},
+  {ch:"午",on:"ゴ",kun:"",meaning:"noon (12-hour period)",level:"N5",strokes:4},
+  {ch:"前",on:"ゼン",kun:"まえ",meaning:"before / front",level:"N5",strokes:9},
+  {ch:"後",on:"ゴ・コウ",kun:"あと・うしろ",meaning:"after / behind",level:"N5",strokes:9},
+  {ch:"朝",on:"チョウ",kun:"あさ",meaning:"morning",level:"N5",strokes:12},
+  {ch:"昼",on:"チュウ",kun:"ひる",meaning:"daytime / noon",level:"N5",strokes:9},
+  {ch:"夜",on:"ヤ",kun:"よる・よ",meaning:"night",level:"N5",strokes:8},
+  {ch:"大",on:"ダイ・タイ",kun:"おお(きい)",meaning:"big / large",level:"N5",strokes:3},
+  {ch:"小",on:"ショウ",kun:"ちい(さい)・こ",meaning:"small",level:"N5",strokes:3},
+  {ch:"中",on:"チュウ",kun:"なか",meaning:"middle / inside",level:"N5",strokes:4},
+  {ch:"上",on:"ジョウ",kun:"うえ・のぼ(る)",meaning:"above / up",level:"N5",strokes:3},
+  {ch:"下",on:"カ・ゲ",kun:"した・さ(がる)",meaning:"below / down",level:"N5",strokes:3},
+  {ch:"左",on:"サ",kun:"ひだり",meaning:"left",level:"N5",strokes:5},
+  {ch:"右",on:"ウ・ユウ",kun:"みぎ",meaning:"right",level:"N5",strokes:5},
+  {ch:"外",on:"ガイ・ゲ",kun:"そと・はず(れる)",meaning:"outside",level:"N5",strokes:5},
+  {ch:"内",on:"ナイ・ダイ",kun:"うち",meaning:"inside",level:"N5",strokes:4},
+  {ch:"東",on:"トウ",kun:"ひがし",meaning:"east",level:"N5",strokes:8},
+  {ch:"西",on:"セイ・サイ",kun:"にし",meaning:"west",level:"N5",strokes:6},
+  {ch:"南",on:"ナン・ナ",kun:"みなみ",meaning:"south",level:"N5",strokes:9},
+  {ch:"北",on:"ホク",kun:"きた",meaning:"north",level:"N5",strokes:5},
+  {ch:"国",on:"コク",kun:"くに",meaning:"country",level:"N5",strokes:8},
+  {ch:"語",on:"ゴ",kun:"かた(る)",meaning:"language / word",level:"N5",strokes:14},
+  {ch:"文",on:"ブン・モン",kun:"ふみ",meaning:"sentence / writing",level:"N5",strokes:4},
+  {ch:"字",on:"ジ",kun:"あざ",meaning:"character / letter",level:"N5",strokes:6},
+  {ch:"本",on:"ホン",kun:"もと",meaning:"book / origin",level:"N5",strokes:5},
+  {ch:"名",on:"メイ・ミョウ",kun:"な",meaning:"name",level:"N5",strokes:6},
+  {ch:"白",on:"ハク・ビャク",kun:"しろ・しら",meaning:"white",level:"N5",strokes:5},
+  {ch:"百",on:"ヒャク",kun:"",meaning:"hundred",level:"N5",strokes:6},
+  {ch:"千",on:"セン",kun:"ち",meaning:"thousand",level:"N5",strokes:3},
+  {ch:"万",on:"マン・バン",kun:"",meaning:"ten thousand",level:"N5",strokes:3},
+  {ch:"円",on:"エン",kun:"まる(い)",meaning:"yen / circle",level:"N5",strokes:4},
+  {ch:"一",on:"イチ・イツ",kun:"ひと",meaning:"one",level:"N5",strokes:1},
+  {ch:"二",on:"ニ",kun:"ふた",meaning:"two",level:"N5",strokes:2},
+  {ch:"三",on:"サン",kun:"み・みっ",meaning:"three",level:"N5",strokes:3},
+  {ch:"四",on:"シ",kun:"よ・よっ",meaning:"four",level:"N5",strokes:5},
+  {ch:"五",on:"ゴ",kun:"いつ",meaning:"five",level:"N5",strokes:4},
+  {ch:"六",on:"ロク",kun:"む・むっ",meaning:"six",level:"N5",strokes:4},
+  {ch:"七",on:"シチ",kun:"なな",meaning:"seven",level:"N5",strokes:2},
+  {ch:"八",on:"ハチ",kun:"や・やっ",meaning:"eight",level:"N5",strokes:2},
+  {ch:"九",on:"キュウ・ク",kun:"ここの",meaning:"nine",level:"N5",strokes:2},
+  {ch:"十",on:"ジュウ・ジッ",kun:"とお・と",meaning:"ten",level:"N5",strokes:2},
+  {ch:"何",on:"カ",kun:"なに・なん",meaning:"what",level:"N5",strokes:7},
+  {ch:"見",on:"ケン",kun:"み(る)・み(える)",meaning:"see / look",level:"N5",strokes:7},
+  {ch:"聞",on:"ブン・モン",kun:"き(く)・き(こえる)",meaning:"hear / ask",level:"N5",strokes:14},
+  {ch:"言",on:"ゲン・ゴン",kun:"い(う)・こと",meaning:"say / word",level:"N5",strokes:7},
+  {ch:"読",on:"ドク・トク",kun:"よ(む)",meaning:"read",level:"N5",strokes:14},
+  {ch:"書",on:"ショ",kun:"か(く)",meaning:"write",level:"N5",strokes:10},
+  {ch:"食",on:"ショク",kun:"た(べる)・く(う)",meaning:"eat / food",level:"N5",strokes:9},
+  {ch:"飲",on:"イン",kun:"の(む)",meaning:"drink",level:"N5",strokes:12},
+  {ch:"買",on:"バイ",kun:"か(う)",meaning:"buy",level:"N5",strokes:12},
+  {ch:"来",on:"ライ",kun:"く(る)・き(たる)",meaning:"come",level:"N5",strokes:7},
+  {ch:"行",on:"コウ・ギョウ",kun:"い(く)・おこな(う)",meaning:"go",level:"N5",strokes:6},
+  {ch:"帰",on:"キ",kun:"かえ(る)",meaning:"return home",level:"N5",strokes:10},
+  {ch:"入",on:"ニュウ",kun:"い(る)・い(れる)・はい(る)",meaning:"enter / put in",level:"N5",strokes:2},
+  {ch:"出",on:"シュツ・スイ",kun:"で(る)・だ(す)",meaning:"exit / go out",level:"N5",strokes:5},
+  {ch:"休",on:"キュウ",kun:"やす(む)",meaning:"rest",level:"N5",strokes:6},
+  {ch:"立",on:"リツ・リュウ",kun:"た(つ)・た(てる)",meaning:"stand",level:"N5",strokes:5},
+  {ch:"高",on:"コウ",kun:"たか(い)",meaning:"high / expensive",level:"N5",strokes:10},
+  {ch:"安",on:"アン",kun:"やす(い)",meaning:"cheap / safe",level:"N5",strokes:6},
+  {ch:"長",on:"チョウ",kun:"なが(い)・おさ",meaning:"long / leader",level:"N5",strokes:8},
+  {ch:"新",on:"シン",kun:"あたら(しい)・あら",meaning:"new",level:"N5",strokes:13},
+  {ch:"古",on:"コ",kun:"ふる(い)",meaning:"old",level:"N5",strokes:5},
+  {ch:"多",on:"タ",kun:"おお(い)",meaning:"many / much",level:"N5",strokes:6},
+  {ch:"少",on:"ショウ",kun:"すく(ない)・すこ(し)",meaning:"few / little",level:"N5",strokes:4},
+  {ch:"好",on:"コウ",kun:"す(き)・この(む)",meaning:"like / fond of",level:"N5",strokes:6},
+  {ch:"明",on:"メイ・ミョウ",kun:"あか(るい)・あき(らか)",meaning:"bright / clear",level:"N5",strokes:8},
+  {ch:"暗",on:"アン",kun:"くら(い)",meaning:"dark",level:"N5",strokes:13},
+  {ch:"暑",on:"ショ",kun:"あつ(い)",meaning:"hot (weather)",level:"N5",strokes:12},
+  {ch:"寒",on:"カン",kun:"さむ(い)",meaning:"cold",level:"N5",strokes:12},
+  {ch:"近",on:"キン",kun:"ちか(い)",meaning:"near / close",level:"N5",strokes:7},
+  {ch:"遠",on:"エン",kun:"とお(い)",meaning:"far",level:"N5",strokes:13},
+  {ch:"早",on:"ソウ・サッ",kun:"はや(い)・はや(める)",meaning:"early / fast",level:"N5",strokes:6},
+  {ch:"間",on:"カン・ケン",kun:"あいだ・ま",meaning:"interval / between",level:"N5",strokes:12},
+  {ch:"店",on:"テン",kun:"みせ",meaning:"shop",level:"N5",strokes:8},
+  {ch:"駅",on:"エキ",kun:"",meaning:"station",level:"N5",strokes:14},
+  {ch:"電",on:"デン",kun:"",meaning:"electricity",level:"N5",strokes:13},
+  {ch:"車",on:"シャ",kun:"くるま",meaning:"car / vehicle",level:"N5",strokes:7},
+  {ch:"道",on:"ドウ",kun:"みち",meaning:"road / way",level:"N5",strokes:12},
+  {ch:"町",on:"チョウ",kun:"まち",meaning:"town",level:"N5",strokes:7},
+  {ch:"社",on:"シャ",kun:"やしろ",meaning:"company / shrine",level:"N5",strokes:7},
+  {ch:"会",on:"カイ・エ",kun:"あ(う)",meaning:"meet / association",level:"N5",strokes:6},
+  {ch:"家",on:"カ・ケ",kun:"いえ・や",meaning:"house / family",level:"N5",strokes:10},
+  {ch:"室",on:"シツ",kun:"むろ",meaning:"room",level:"N5",strokes:9},
+  {ch:"門",on:"モン",kun:"かど",meaning:"gate",level:"N5",strokes:8},
+  // ── N4 from lessons ──
+  {ch:"覚",on:"カク",kun:"おぼ(える)・さ(ます)",meaning:"memorise / wake up",level:"N4",strokes:12},
+  {ch:"勝",on:"ショウ",kun:"か(つ)",meaning:"win / victory",level:"N4",strokes:12},
+  {ch:"負",on:"フ",kun:"ま(ける)・おぶ(う)",meaning:"lose / carry on back",level:"N4",strokes:9},
+  {ch:"説",on:"セツ・ゼイ",kun:"と(く)",meaning:"explain / theory",level:"N4",strokes:14},
+  {ch:"授",on:"ジュ",kun:"さず(ける)",meaning:"grant / confer",level:"N4",strokes:11},
+  {ch:"業",on:"ギョウ・ゴウ",kun:"わざ",meaning:"work / business",level:"N4",strokes:13},
+  {ch:"注",on:"チュウ",kun:"そそ(ぐ)",meaning:"pour / caution",level:"N4",strokes:8},
+  {ch:"意",on:"イ",kun:"",meaning:"mind / meaning",level:"N4",strokes:13},
+  {ch:"乗",on:"ジョウ",kun:"の(る)・の(せる)",meaning:"ride / board",level:"N4",strokes:9},
+  {ch:"降",on:"コウ",kun:"お(りる)・ふ(る)",meaning:"get off / rain/snow falls",level:"N4",strokes:10},
+  {ch:"運",on:"ウン",kun:"はこ(ぶ)",meaning:"carry / luck",level:"N4",strokes:12},
+  {ch:"転",on:"テン",kun:"ころ(がる)・ころ(ぶ)",meaning:"roll / turn / change",level:"N4",strokes:11},
+  {ch:"働",on:"ドウ",kun:"はたら(く)",meaning:"work / labour",level:"N4",strokes:13},
+  {ch:"旅",on:"リョ",kun:"たび",meaning:"journey / travel",level:"N4",strokes:10},
+  {ch:"場",on:"ジョウ",kun:"ば",meaning:"place / scene",level:"N4",strokes:12},
+  {ch:"合",on:"ゴウ・ガッ・カッ",kun:"あ(う)・あ(わす)",meaning:"combine / suit / match",level:"N4",strokes:6},
+  {ch:"始",on:"シ",kun:"はじ(まる)・はじ(める)",meaning:"begin / start",level:"N4",strokes:8},
+  {ch:"終",on:"シュウ",kun:"お(わる)・お(える)",meaning:"end / finish",level:"N4",strokes:11},
+  {ch:"送",on:"ソウ",kun:"おく(る)",meaning:"send",level:"N4",strokes:9},
+  {ch:"受",on:"ジュ",kun:"う(ける)・う(かる)",meaning:"receive / accept",level:"N4",strokes:8},
+  {ch:"待",on:"タイ",kun:"ま(つ)",meaning:"wait",level:"N4",strokes:9},
+  {ch:"押",on:"オウ",kun:"お(す)",meaning:"push",level:"N4",strokes:8},
+  {ch:"引",on:"イン",kun:"ひ(く)",meaning:"pull / draw",level:"N4",strokes:4},
+  {ch:"落",on:"ラク",kun:"お(ちる)・お(とす)",meaning:"fall / drop",level:"N4",strokes:12},
+  {ch:"起",on:"キ",kun:"お(きる)・お(こす)",meaning:"get up / occur",level:"N4",strokes:10},
+  {ch:"寝",on:"シン",kun:"ね(る)",meaning:"sleep",level:"N4",strokes:13},
+  {ch:"忘",on:"ボウ",kun:"わす(れる)",meaning:"forget",level:"N4",strokes:7},
+  {ch:"困",on:"コン",kun:"こま(る)",meaning:"be troubled",level:"N4",strokes:7},
+  {ch:"変",on:"ヘン",kun:"か(わる)・か(える)",meaning:"change / strange",level:"N4",strokes:9},
+  {ch:"止",on:"シ",kun:"と(まる)・と(める)",meaning:"stop",level:"N4",strokes:4},
+  {ch:"消",on:"ショウ",kun:"き(える)・け(す)",meaning:"disappear / erase",level:"N4",strokes:10},
+  {ch:"決",on:"ケツ",kun:"き(める)・き(まる)",meaning:"decide",level:"N4",strokes:7},
+  {ch:"急",on:"キュウ",kun:"いそ(ぐ)・きゅう",meaning:"hurry / sudden",level:"N4",strokes:9},
+  {ch:"特",on:"トク",kun:"",meaning:"special",level:"N4",strokes:10},
+  {ch:"有",on:"ユウ・ウ",kun:"あ(る)",meaning:"have / exist",level:"N4",strokes:6},
+  {ch:"必",on:"ヒツ",kun:"かなら(ず)",meaning:"inevitable / necessary",level:"N4",strokes:5},
+  {ch:"要",on:"ヨウ",kun:"い(る)・かなめ",meaning:"need / important",level:"N4",strokes:9},
+  {ch:"以",on:"イ",kun:"",meaning:"by means of / compared with",level:"N4",strokes:5},
+  {ch:"上",on:"ジョウ",kun:"うえ・のぼ(る)",meaning:"above / superior",level:"N4",strokes:3},
+  {ch:"部",on:"ブ",kun:"",meaning:"section / part",level:"N4",strokes:11},
+  {ch:"事",on:"ジ・ズ",kun:"こと",meaning:"thing / affair",level:"N4",strokes:8},
+  {ch:"物",on:"ブツ・モツ",kun:"もの",meaning:"thing / object",level:"N4",strokes:8},
+  {ch:"気",on:"キ・ケ",kun:"",meaning:"spirit / feeling / weather",level:"N4",strokes:6},
+  {ch:"悩",on:"ノウ",kun:"なや(む)",meaning:"worry / anguish",level:"N4",strokes:12},
+  {ch:"相",on:"ソウ・ショウ",kun:"あい",meaning:"together / mutual",level:"N4",strokes:9},
+  {ch:"談",on:"ダン",kun:"",meaning:"discuss / talk",level:"N4",strokes:15},
+  {ch:"問",on:"モン",kun:"と(う)・と(い)",meaning:"question / ask",level:"N4",strokes:11},
+  {ch:"題",on:"ダイ",kun:"",meaning:"topic / title",level:"N4",strokes:18},
+  {ch:"答",on:"トウ",kun:"こた(える)・こた(え)",meaning:"answer / reply",level:"N4",strokes:12},
+  {ch:"試",on:"シ",kun:"こころ(みる)・ため(す)",meaning:"try / test",level:"N4",strokes:13},
+  {ch:"験",on:"ケン・ゲン",kun:"",meaning:"test / experience",level:"N4",strokes:18},
+  {ch:"習",on:"シュウ",kun:"なら(う)",meaning:"learn / practice",level:"N4",strokes:11},
+  {ch:"練",on:"レン",kun:"ね(る)",meaning:"knead / drill / practice",level:"N4",strokes:14},
+  {ch:"科",on:"カ",kun:"",meaning:"department / subject",level:"N4",strokes:9},
+  {ch:"教",on:"キョウ",kun:"おし(える)・おそ(わる)",meaning:"teach / religion",level:"N4",strokes:11},
+  {ch:"係",on:"ケイ",kun:"かか(る)・かかり",meaning:"connection / person in charge",level:"N4",strokes:9},
+  {ch:"号",on:"ゴウ",kun:"",meaning:"number / name",level:"N4",strokes:5},
+  {ch:"番",on:"バン",kun:"",meaning:"number / turn",level:"N4",strokes:12},
+  {ch:"階",on:"カイ",kun:"",meaning:"floor / storey",level:"N4",strokes:12},
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — VOCAB (from sessions + N5 core)
+// ═══════════════════════════════════════════════════════════
+const VOCAB = [
+  // ══ N5 VERBS ══
+  // Motion & direction
+  {kana:"いきます",kanji:"行きます",meaning:"to go",lesson:"N5",type:"verb"},
+  {kana:"きます",kanji:"来ます",meaning:"to come",lesson:"N5",type:"verb"},
+  {kana:"かえります",kanji:"帰ります",meaning:"to return / go home",lesson:"N5",type:"verb"},
+  {kana:"のります",kanji:"乗ります",meaning:"to ride / board (transport)",lesson:"N5",type:"verb"},
+  {kana:"おります",kanji:"降ります",meaning:"to get off (transport)",lesson:"N5",type:"verb"},
+  {kana:"あるきます",kanji:"歩きます",meaning:"to walk",lesson:"N5",type:"verb"},
+  {kana:"はしります",kanji:"走ります",meaning:"to run",lesson:"N5",type:"verb"},
+  {kana:"およぎます",kanji:"泳ぎます",meaning:"to swim",lesson:"N5",type:"verb"},
+  {kana:"とびます",kanji:"飛びます",meaning:"to fly / jump",lesson:"N5",type:"verb"},
+  {kana:"わたります",kanji:"渡ります",meaning:"to cross (a bridge/road)",lesson:"N5",type:"verb"},
+  {kana:"まがります",kanji:"曲がります",meaning:"to turn (left/right)",lesson:"N5",type:"verb"},
+  // Eating & drinking
+  {kana:"たべます",kanji:"食べます",meaning:"to eat",lesson:"N5",type:"verb"},
+  {kana:"のみます",kanji:"飲みます",meaning:"to drink",lesson:"N5",type:"verb"},
+  {kana:"つくります",kanji:"作ります",meaning:"to make / cook",lesson:"N5",type:"verb"},
+  {kana:"きります",kanji:"切ります",meaning:"to cut",lesson:"N5",type:"verb"},
+  // Communication
+  {kana:"はなします",kanji:"話します",meaning:"to speak / talk",lesson:"N5",type:"verb"},
+  {kana:"ききます",kanji:"聞きます",meaning:"to listen / ask",lesson:"N5",type:"verb"},
+  {kana:"いいます",kanji:"言います",meaning:"to say",lesson:"N5",type:"verb"},
+  {kana:"よびます",kanji:"呼びます",meaning:"to call (out to) / invite",lesson:"N5",type:"verb"},
+  {kana:"でんわします",kanji:"電話します",meaning:"to phone / call",lesson:"N5",type:"verb"},
+  {kana:"こたえます",kanji:"答えます",meaning:"to answer / reply",lesson:"N5",type:"verb"},
+  {kana:"しつもんします",kanji:"質問します",meaning:"to ask a question",lesson:"N5",type:"verb"},
+  // Study & work
+  {kana:"かきます",kanji:"書きます",meaning:"to write",lesson:"N5",type:"verb"},
+  {kana:"よみます",kanji:"読みます",meaning:"to read",lesson:"N5",type:"verb"},
+  {kana:"べんきょうします",kanji:"勉強します",meaning:"to study",lesson:"N5",type:"verb"},
+  {kana:"おしえます",kanji:"教えます",meaning:"to teach / tell",lesson:"N5",type:"verb"},
+  {kana:"ならいます",kanji:"習います",meaning:"to learn / take lessons",lesson:"N5",type:"verb"},
+  {kana:"しごとをします",kanji:"仕事をします",meaning:"to work",lesson:"N5",type:"verb"},
+  {kana:"はたらきます",kanji:"働きます",meaning:"to work (at a job)",lesson:"N5",type:"verb"},
+  {kana:"つかいます",kanji:"使います",meaning:"to use",lesson:"N5",type:"verb"},
+  // Daily routine
+  {kana:"おきます",kanji:"起きます",meaning:"to get up / wake up",lesson:"N5",type:"verb"},
+  {kana:"ねます",kanji:"寝ます",meaning:"to sleep / go to bed",lesson:"N5",type:"verb"},
+  {kana:"あびます",kanji:"浴びます",meaning:"to shower / bathe",lesson:"N5",type:"verb"},
+  {kana:"あらいます",kanji:"洗います",meaning:"to wash",lesson:"N5",type:"verb"},
+  {kana:"みがきます",kanji:"磨きます",meaning:"to brush / polish",lesson:"N5",type:"verb"},
+  {kana:"きます",kanji:"着ます",meaning:"to wear / put on (upper body)",lesson:"N5",type:"verb"},
+  {kana:"はきます",kanji:"履きます",meaning:"to wear / put on (lower body/feet)",lesson:"N5",type:"verb"},
+  {kana:"かぶります",kanji:"被ります",meaning:"to put on (hat/head)",lesson:"N5",type:"verb"},
+  {kana:"ぬぎます",kanji:"脱ぎます",meaning:"to take off (clothing)",lesson:"N5",type:"verb"},
+  // Shopping & money
+  {kana:"かいます",kanji:"買います",meaning:"to buy",lesson:"N5",type:"verb"},
+  {kana:"うります",kanji:"売ります",meaning:"to sell",lesson:"N5",type:"verb"},
+  {kana:"はらいます",kanji:"払います",meaning:"to pay",lesson:"N5",type:"verb"},
+  {kana:"かります",kanji:"借ります",meaning:"to borrow",lesson:"N5",type:"verb"},
+  {kana:"かします",kanji:"貸します",meaning:"to lend",lesson:"N5",type:"verb"},
+  // Giving & receiving
+  {kana:"あげます",kanji:"",meaning:"to give (to someone else)",lesson:"N5",type:"verb"},
+  {kana:"くれます",kanji:"",meaning:"to give (to me / my group)",lesson:"N5",type:"verb"},
+  {kana:"もらいます",kanji:"",meaning:"to receive",lesson:"N5",type:"verb"},
+  {kana:"おくります",kanji:"送ります",meaning:"to send / see off",lesson:"N5",type:"verb"},
+  {kana:"もってきます",kanji:"持って来ます",meaning:"to bring",lesson:"N5",type:"verb"},
+  {kana:"もっていきます",kanji:"持って行きます",meaning:"to take (something somewhere)",lesson:"N5",type:"verb"},
+  // Seeing & showing
+  {kana:"みます",kanji:"見ます",meaning:"to look at / watch / see",lesson:"N5",type:"verb"},
+  {kana:"みせます",kanji:"見せます",meaning:"to show",lesson:"N5",type:"verb"},
+  {kana:"さがします",kanji:"探します",meaning:"to look for / search",lesson:"N5",type:"verb"},
+  // Meetings & social
+  {kana:"あいます",kanji:"会います",meaning:"to meet",lesson:"N5",type:"verb"},
+  {kana:"まちます",kanji:"待ちます",meaning:"to wait",lesson:"N5",type:"verb"},
+  {kana:"しょうかいします",kanji:"紹介します",meaning:"to introduce",lesson:"N5",type:"verb"},
+  {kana:"けっこんします",kanji:"結婚します",meaning:"to get married",lesson:"N5",type:"verb"},
+  {kana:"りこんします",kanji:"離婚します",meaning:"to divorce",lesson:"N5",type:"verb"},
+  {kana:"あそびます",kanji:"遊びます",meaning:"to play / have fun",lesson:"N5",type:"verb"},
+  // Opening / closing / switching
+  {kana:"あけます",kanji:"開けます",meaning:"to open (something)",lesson:"N5",type:"verb"},
+  {kana:"しめます",kanji:"閉めます",meaning:"to close (something)",lesson:"N5",type:"verb"},
+  {kana:"あきます",kanji:"開きます",meaning:"to open (intransitive)",lesson:"N5",type:"verb"},
+  {kana:"しまります",kanji:"閉まります",meaning:"to close (intransitive)",lesson:"N5",type:"verb"},
+  {kana:"つけます",kanji:"付けます",meaning:"to turn on / switch on",lesson:"N5",type:"verb"},
+  {kana:"けします",kanji:"消します",meaning:"to turn off / erase",lesson:"N5",type:"verb"},
+  {kana:"いれます",kanji:"入れます",meaning:"to put in / insert",lesson:"N5",type:"verb"},
+  {kana:"だします",kanji:"出します",meaning:"to take out / hand in",lesson:"N5",type:"verb"},
+  {kana:"おきます",kanji:"置きます",meaning:"to put / place (something)",lesson:"N5",type:"verb"},
+  // Physical actions
+  {kana:"たちます",kanji:"立ちます",meaning:"to stand up",lesson:"N5",type:"verb"},
+  {kana:"すわります",kanji:"座ります",meaning:"to sit down",lesson:"N5",type:"verb"},
+  {kana:"おします",kanji:"押します",meaning:"to push / press",lesson:"N5",type:"verb"},
+  {kana:"ひきます",kanji:"引きます",meaning:"to pull / play (strings)",lesson:"N5",type:"verb"},
+  {kana:"もちます",kanji:"持ちます",meaning:"to hold / have / carry",lesson:"N5",type:"verb"},
+  {kana:"なげます",kanji:"投げます",meaning:"to throw",lesson:"N5",type:"verb"},
+  {kana:"たたきます",kanji:"叩きます",meaning:"to hit / knock / clap",lesson:"N5",type:"verb"},
+  {kana:"けります",kanji:"蹴ります",meaning:"to kick",lesson:"N5",type:"verb"},
+  // Cognition & emotion
+  {kana:"わかります",kanji:"分かります",meaning:"to understand",lesson:"N5",type:"verb"},
+  {kana:"しります",kanji:"知ります",meaning:"to get to know / find out",lesson:"N5",type:"verb"},
+  {kana:"おもいます",kanji:"思います",meaning:"to think / feel",lesson:"N5",type:"verb"},
+  {kana:"かんがえます",kanji:"考えます",meaning:"to think / consider",lesson:"N5",type:"verb"},
+  {kana:"おぼえます",kanji:"覚えます",meaning:"to remember / memorise",lesson:"N5",type:"verb"},
+  {kana:"わすれます",kanji:"忘れます",meaning:"to forget",lesson:"N5",type:"verb"},
+  {kana:"しんじます",kanji:"信じます",meaning:"to believe / trust",lesson:"N5",type:"verb"},
+  {kana:"きめます",kanji:"決めます",meaning:"to decide",lesson:"N5",type:"verb"},
+  {kana:"えらびます",kanji:"選びます",meaning:"to choose / select",lesson:"N5",type:"verb"},
+  // Existence
+  {kana:"あります",kanji:"",meaning:"to exist / there is (things)",lesson:"N5",type:"verb"},
+  {kana:"います",kanji:"",meaning:"to exist / there is (people/animals)",lesson:"N5",type:"verb"},
+  {kana:"すみます",kanji:"住みます",meaning:"to live / reside",lesson:"N5",type:"verb"},
+  {kana:"うまれます",kanji:"生まれます",meaning:"to be born",lesson:"N5",type:"verb"},
+  {kana:"しにます",kanji:"死にます",meaning:"to die",lesson:"N5",type:"verb"},
+  // Change & state
+  {kana:"なります",kanji:"",meaning:"to become",lesson:"N5",type:"verb"},
+  {kana:"かわります",kanji:"変わります",meaning:"to change (intransitive)",lesson:"N5",type:"verb"},
+  {kana:"はじまります",kanji:"始まります",meaning:"to begin (intransitive)",lesson:"N5",type:"verb"},
+  {kana:"おわります",kanji:"終わります",meaning:"to finish / end (intransitive)",lesson:"N5",type:"verb"},
+  {kana:"はじめます",kanji:"始めます",meaning:"to start (something)",lesson:"N5",type:"verb"},
+  {kana:"おわります",kanji:"終わります",meaning:"to end / finish",lesson:"N5",type:"verb"},
+  {kana:"やめます",kanji:"止めます",meaning:"to stop / quit",lesson:"N5",type:"verb"},
+  {kana:"つきます",kanji:"着きます",meaning:"to arrive",lesson:"N5",type:"verb"},
+  {kana:"でます",kanji:"出ます",meaning:"to leave / go out / appear",lesson:"N5",type:"verb"},
+  {kana:"はいります",kanji:"入ります",meaning:"to enter / go in",lesson:"N5",type:"verb"},
+  {kana:"とまります",kanji:"止まります",meaning:"to stop / stay (at a place)",lesson:"N5",type:"verb"},
+  // Music & leisure
+  {kana:"うたいます",kanji:"歌います",meaning:"to sing",lesson:"N5",type:"verb"},
+  {kana:"ひきます",kanji:"弾きます",meaning:"to play (piano/guitar)",lesson:"N5",type:"verb"},
+  {kana:"ふきます",kanji:"吹きます",meaning:"to blow / play (wind instrument)",lesson:"N5",type:"verb"},
+  {kana:"おどります",kanji:"踊ります",meaning:"to dance",lesson:"N5",type:"verb"},
+  {kana:"とります",kanji:"撮ります",meaning:"to take (a photo)",lesson:"N5",type:"verb"},
+  // Weather & nature
+  {kana:"ふります",kanji:"降ります",meaning:"to fall (rain/snow)",lesson:"N5",type:"verb"},
+  {kana:"ふきます",kanji:"吹きます",meaning:"to blow (wind)",lesson:"N5",type:"verb"},
+  // Service & assistance
+  {kana:"てつだいます",kanji:"手伝います",meaning:"to help / assist",lesson:"N5",type:"verb"},
+  {kana:"たのみます",kanji:"頼みます",meaning:"to ask / request / order",lesson:"N5",type:"verb"},
+  {kana:"みせます",kanji:"見せます",meaning:"to show",lesson:"N5",type:"verb"},
+  {kana:"いらっしゃいます",kanji:"",meaning:"honorific: to be / go / come",lesson:"N5",type:"verb"},
+  // Miscellaneous verbs
+  {kana:"もらいます",kanji:"",meaning:"to receive",lesson:"N5",type:"verb"},
+  {kana:"かえます",kanji:"変えます",meaning:"to change (something)",lesson:"N5",type:"verb"},
+  {kana:"なおします",kanji:"直します",meaning:"to fix / correct",lesson:"N5",type:"verb"},
+  {kana:"こわします",kanji:"壊します",meaning:"to break (something)",lesson:"N5",type:"verb"},
+  {kana:"つくります",kanji:"作ります",meaning:"to make / build",lesson:"N5",type:"verb"},
+  {kana:"かたづけます",kanji:"片付けます",meaning:"to tidy up / put away",lesson:"N5",type:"verb"},
+  {kana:"そうじします",kanji:"掃除します",meaning:"to clean / tidy",lesson:"N5",type:"verb"},
+  {kana:"せんたくします",kanji:"洗濯します",meaning:"to do laundry",lesson:"N5",type:"verb"},
+  {kana:"りょうりします",kanji:"料理します",meaning:"to cook",lesson:"N5",type:"verb"},
+  {kana:"かいものします",kanji:"買い物します",meaning:"to go shopping",lesson:"N5",type:"verb"},
+  {kana:"さんぽします",kanji:"散歩します",meaning:"to go for a walk",lesson:"N5",type:"verb"},
+  {kana:"りょこうします",kanji:"旅行します",meaning:"to travel",lesson:"N5",type:"verb"},
+  {kana:"うんてんします",kanji:"運転します",meaning:"to drive",lesson:"N5",type:"verb"},
+  {kana:"ちゅうもんします",kanji:"注文します",meaning:"to order (food/goods)",lesson:"N5",type:"verb"},
+  {kana:"よやくします",kanji:"予約します",meaning:"to reserve / book",lesson:"N5",type:"verb"},
+  {kana:"れんしゅうします",kanji:"練習します",meaning:"to practise",lesson:"N5",type:"verb"},
+  {kana:"けんきゅうします",kanji:"研究します",meaning:"to research / study",lesson:"N5",type:"verb"},
+  {kana:"しつれいします",kanji:"失礼します",meaning:"excuse me (parting / entering)",lesson:"N5",type:"verb"},
+  // ══ N5 ADJECTIVES — i-adjectives ══
+  {kana:"おおきい",kanji:"大きい",meaning:"big / large",lesson:"N5",type:"adj"},
+  {kana:"ちいさい",kanji:"小さい",meaning:"small / little",lesson:"N5",type:"adj"},
+  {kana:"たかい",kanji:"高い",meaning:"expensive / tall / high",lesson:"N5",type:"adj"},
+  {kana:"やすい",kanji:"安い",meaning:"cheap / inexpensive",lesson:"N5",type:"adj"},
+  {kana:"ながい",kanji:"長い",meaning:"long",lesson:"N5",type:"adj"},
+  {kana:"みじかい",kanji:"短い",meaning:"short (length)",lesson:"N5",type:"adj"},
+  {kana:"ひろい",kanji:"広い",meaning:"wide / spacious",lesson:"N5",type:"adj"},
+  {kana:"せまい",kanji:"狭い",meaning:"narrow / cramped",lesson:"N5",type:"adj"},
+  {kana:"おもい",kanji:"重い",meaning:"heavy",lesson:"N5",type:"adj"},
+  {kana:"かるい",kanji:"軽い",meaning:"light (weight)",lesson:"N5",type:"adj"},
+  {kana:"あつい",kanji:"厚い",meaning:"thick",lesson:"N5",type:"adj"},
+  {kana:"うすい",kanji:"薄い",meaning:"thin / light (colour/taste)",lesson:"N5",type:"adj"},
+  {kana:"あたらしい",kanji:"新しい",meaning:"new",lesson:"N5",type:"adj"},
+  {kana:"ふるい",kanji:"古い",meaning:"old (things)",lesson:"N5",type:"adj"},
+  {kana:"わかい",kanji:"若い",meaning:"young",lesson:"N5",type:"adj"},
+  {kana:"とおい",kanji:"遠い",meaning:"far / distant",lesson:"N5",type:"adj"},
+  {kana:"ちかい",kanji:"近い",meaning:"near / close",lesson:"N5",type:"adj"},
+  {kana:"はやい",kanji:"早い",meaning:"early",lesson:"N5",type:"adj"},
+  {kana:"はやい",kanji:"速い",meaning:"fast / quick",lesson:"N5",type:"adj"},
+  {kana:"おそい",kanji:"遅い",meaning:"slow / late",lesson:"N5",type:"adj"},
+  {kana:"おおい",kanji:"多い",meaning:"many / a lot",lesson:"N5",type:"adj"},
+  {kana:"すくない",kanji:"少ない",meaning:"few / little (amount)",lesson:"N5",type:"adj"},
+  {kana:"むずかしい",kanji:"難しい",meaning:"difficult",lesson:"N5",type:"adj"},
+  {kana:"やさしい",kanji:"優しい",meaning:"kind / gentle",lesson:"N5",type:"adj"},
+  {kana:"やさしい",kanji:"易しい",meaning:"easy (task)",lesson:"N5",type:"adj"},
+  {kana:"おもしろい",kanji:"面白い",meaning:"interesting / funny",lesson:"N5",type:"adj"},
+  {kana:"つまらない",kanji:"",meaning:"boring / dull",lesson:"N5",type:"adj"},
+  {kana:"たのしい",kanji:"楽しい",meaning:"fun / enjoyable",lesson:"N5",type:"adj"},
+  {kana:"かなしい",kanji:"悲しい",meaning:"sad",lesson:"N5",type:"adj"},
+  {kana:"うれしい",kanji:"嬉しい",meaning:"happy / glad",lesson:"N5",type:"adj"},
+  {kana:"さびしい",kanji:"寂しい",meaning:"lonely",lesson:"N5",type:"adj"},
+  {kana:"こわい",kanji:"怖い",meaning:"scary / frightening",lesson:"N5",type:"adj"},
+  {kana:"いそがしい",kanji:"忙しい",meaning:"busy",lesson:"N5",type:"adj"},
+  {kana:"つかれた",kanji:"疲れた",meaning:"tired",lesson:"N5",type:"adj"},
+  {kana:"からい",kanji:"辛い",meaning:"spicy / hot",lesson:"N5",type:"adj"},
+  {kana:"あまい",kanji:"甘い",meaning:"sweet",lesson:"N5",type:"adj"},
+  {kana:"からい",kanji:"辛い",meaning:"salty / spicy",lesson:"N5",type:"adj"},
+  {kana:"すっぱい",kanji:"酸っぱい",meaning:"sour",lesson:"N5",type:"adj"},
+  {kana:"にがい",kanji:"苦い",meaning:"bitter",lesson:"N5",type:"adj"},
+  {kana:"おいしい",kanji:"美味しい",meaning:"delicious / tasty",lesson:"N5",type:"adj"},
+  {kana:"まずい",kanji:"",meaning:"bad-tasting / poor quality",lesson:"N5",type:"adj"},
+  {kana:"あつい",kanji:"暑い",meaning:"hot (weather)",lesson:"N5",type:"adj"},
+  {kana:"さむい",kanji:"寒い",meaning:"cold (weather)",lesson:"N5",type:"adj"},
+  {kana:"あたたかい",kanji:"暖かい",meaning:"warm (weather/feeling)",lesson:"N5",type:"adj"},
+  {kana:"すずしい",kanji:"涼しい",meaning:"cool / refreshing",lesson:"N5",type:"adj"},
+  {kana:"あかるい",kanji:"明るい",meaning:"bright / cheerful",lesson:"N5",type:"adj"},
+  {kana:"くらい",kanji:"暗い",meaning:"dark / gloomy",lesson:"N5",type:"adj"},
+  {kana:"うるさい",kanji:"煩い",meaning:"noisy / annoying",lesson:"N5",type:"adj"},
+  {kana:"かわいい",kanji:"可愛い",meaning:"cute / adorable",lesson:"N5",type:"adj"},
+  {kana:"かっこいい",kanji:"",meaning:"cool / stylish",lesson:"N5",type:"adj"},
+  {kana:"きたない",kanji:"汚い",meaning:"dirty / messy",lesson:"N5",type:"adj"},
+  {kana:"ただしい",kanji:"正しい",meaning:"correct / right",lesson:"N5",type:"adj"},
+  {kana:"わるい",kanji:"悪い",meaning:"bad / wrong",lesson:"N5",type:"adj"},
+  {kana:"よい／いい",kanji:"良い",meaning:"good",lesson:"N5",type:"adj"},
+  {kana:"つよい",kanji:"強い",meaning:"strong",lesson:"N5",type:"adj"},
+  {kana:"よわい",kanji:"弱い",meaning:"weak",lesson:"N5",type:"adj"},
+  {kana:"いたい",kanji:"痛い",meaning:"painful / sore",lesson:"N5",type:"adj"},
+  {kana:"あぶない",kanji:"危ない",meaning:"dangerous",lesson:"N5",type:"adj"},
+  {kana:"やわらかい",kanji:"柔らかい",meaning:"soft",lesson:"N5",type:"adj"},
+  {kana:"かたい",kanji:"硬い",meaning:"hard / tough / stiff",lesson:"N5",type:"adj"},
+  {kana:"あたたかい",kanji:"温かい",meaning:"warm (food/drink/kindness)",lesson:"N5",type:"adj"},
+  {kana:"つめたい",kanji:"冷たい",meaning:"cold (to the touch)",lesson:"N5",type:"adj"},
+  {kana:"すごい",kanji:"凄い",meaning:"amazing / great / terrible",lesson:"N5",type:"adj"},
+  // ── N5 な-adjectives ──
+  {kana:"すきな",kanji:"好きな",meaning:"liked / favourite",lesson:"N5",type:"adj"},
+  {kana:"きらいな",kanji:"嫌いな",meaning:"disliked / hated",lesson:"N5",type:"adj"},
+  {kana:"じょうずな",kanji:"上手な",meaning:"good at / skilful",lesson:"N5",type:"adj"},
+  {kana:"へたな",kanji:"下手な",meaning:"bad at / unskilled",lesson:"N5",type:"adj"},
+  {kana:"しずかな",kanji:"静かな",meaning:"quiet",lesson:"N5",type:"adj"},
+  {kana:"にぎやかな",kanji:"賑やかな",meaning:"lively / bustling",lesson:"N5",type:"adj"},
+  {kana:"きれいな",kanji:"きれいな",meaning:"pretty / clean / neat",lesson:"N5",type:"adj"},
+  {kana:"ゆうめいな",kanji:"有名な",meaning:"famous",lesson:"N5",type:"adj"},
+  {kana:"べんりな",kanji:"便利な",meaning:"convenient",lesson:"N5",type:"adj"},
+  {kana:"ふべんな",kanji:"不便な",meaning:"inconvenient",lesson:"N5",type:"adj"},
+  {kana:"げんきな",kanji:"元気な",meaning:"energetic / healthy / fine",lesson:"N5",type:"adj"},
+  {kana:"たいへんな",kanji:"大変な",meaning:"hard / serious / terrible",lesson:"N5",type:"adj"},
+  {kana:"たいせつな",kanji:"大切な",meaning:"important / precious",lesson:"N5",type:"adj"},
+  {kana:"ひつような",kanji:"必要な",meaning:"necessary / needed",lesson:"N5",type:"adj"},
+  {kana:"とくべつな",kanji:"特別な",meaning:"special",lesson:"N5",type:"adj"},
+  {kana:"いろいろな",kanji:"色々な",meaning:"various / all kinds of",lesson:"N5",type:"adj"},
+  {kana:"おなじ",kanji:"同じ",meaning:"same",lesson:"N5",type:"adj"},
+  {kana:"ちがう",kanji:"違う",meaning:"different / wrong",lesson:"N5",type:"adj"},
+  {kana:"だいじょうぶな",kanji:"大丈夫な",meaning:"OK / fine / no problem",lesson:"N5",type:"adj"},
+  {kana:"ひまな",kanji:"暇な",meaning:"free (time) / not busy",lesson:"N5",type:"adj"},
+  {kana:"まじめな",kanji:"真面目な",meaning:"serious / diligent",lesson:"N5",type:"adj"},
+  {kana:"しんせつな",kanji:"親切な",meaning:"kind / helpful",lesson:"N5",type:"adj"},
+  {kana:"ていねいな",kanji:"丁寧な",meaning:"polite / careful",lesson:"N5",type:"adj"},
+  {kana:"かんたんな",kanji:"簡単な",meaning:"easy / simple",lesson:"N5",type:"adj"},
+  {kana:"ふくざつな",kanji:"複雑な",meaning:"complicated",lesson:"N5",type:"adj"},
+  {kana:"へんな",kanji:"変な",meaning:"strange / odd",lesson:"N5",type:"adj"},
+  {kana:"だめな",kanji:"駄目な",meaning:"no good / useless / not allowed",lesson:"N5",type:"adj"},
+  // ══ N5 NOUNS — People ══
+  {kana:"ひと",kanji:"人",meaning:"person",lesson:"N5",type:"noun"},
+  {kana:"おとこのひと",kanji:"男の人",meaning:"man",lesson:"N5",type:"noun"},
+  {kana:"おんなのひと",kanji:"女の人",meaning:"woman",lesson:"N5",type:"noun"},
+  {kana:"こども",kanji:"子供",meaning:"child / children",lesson:"N5",type:"noun"},
+  {kana:"おとな",kanji:"大人",meaning:"adult",lesson:"N5",type:"noun"},
+  {kana:"ともだち",kanji:"友達",meaning:"friend",lesson:"N5",type:"noun"},
+  {kana:"かのじょ",kanji:"彼女",meaning:"she / girlfriend",lesson:"N5",type:"noun"},
+  {kana:"かれ",kanji:"彼",meaning:"he / boyfriend",lesson:"N5",type:"noun"},
+  {kana:"みなさん",kanji:"皆さん",meaning:"everyone (polite)",lesson:"N5",type:"noun"},
+  {kana:"わたし",kanji:"私",meaning:"I / me",lesson:"N5",type:"noun"},
+  {kana:"あなた",kanji:"貴方",meaning:"you",lesson:"N5",type:"noun"},
+  // Family
+  {kana:"かぞく",kanji:"家族",meaning:"family",lesson:"N5",type:"noun"},
+  {kana:"りょうしん",kanji:"両親",meaning:"parents",lesson:"N5",type:"noun"},
+  {kana:"ちち",kanji:"父",meaning:"my father",lesson:"N5",type:"noun"},
+  {kana:"はは",kanji:"母",meaning:"my mother",lesson:"N5",type:"noun"},
+  {kana:"おとうさん",kanji:"お父さん",meaning:"father (someone else's / polite)",lesson:"N5",type:"noun"},
+  {kana:"おかあさん",kanji:"お母さん",meaning:"mother (someone else's / polite)",lesson:"N5",type:"noun"},
+  {kana:"あに",kanji:"兄",meaning:"my older brother",lesson:"N5",type:"noun"},
+  {kana:"あね",kanji:"姉",meaning:"my older sister",lesson:"N5",type:"noun"},
+  {kana:"おにいさん",kanji:"お兄さん",meaning:"older brother (polite)",lesson:"N5",type:"noun"},
+  {kana:"おねえさん",kanji:"お姉さん",meaning:"older sister (polite)",lesson:"N5",type:"noun"},
+  {kana:"おとうと",kanji:"弟",meaning:"my younger brother",lesson:"N5",type:"noun"},
+  {kana:"いもうと",kanji:"妹",meaning:"my younger sister",lesson:"N5",type:"noun"},
+  {kana:"おじいさん",kanji:"お爺さん",meaning:"grandfather / old man",lesson:"N5",type:"noun"},
+  {kana:"おばあさん",kanji:"お婆さん",meaning:"grandmother / old woman",lesson:"N5",type:"noun"},
+  {kana:"おじさん",kanji:"おじさん",meaning:"uncle / middle-aged man",lesson:"N5",type:"noun"},
+  {kana:"おばさん",kanji:"おばさん",meaning:"aunt / middle-aged woman",lesson:"N5",type:"noun"},
+  // Jobs & roles
+  {kana:"せんせい",kanji:"先生",meaning:"teacher",lesson:"N5",type:"noun"},
+  {kana:"がくせい",kanji:"学生",meaning:"student (university)",lesson:"N5",type:"noun"},
+  {kana:"せいと",kanji:"生徒",meaning:"student (school)",lesson:"N5",type:"noun"},
+  {kana:"かいしゃいん",kanji:"会社員",meaning:"company employee",lesson:"N5",type:"noun"},
+  {kana:"いしゃ",kanji:"医者",meaning:"doctor",lesson:"N5",type:"noun"},
+  {kana:"かんごし",kanji:"看護師",meaning:"nurse",lesson:"N5",type:"noun"},
+  {kana:"けいさつかん",kanji:"警察官",meaning:"police officer",lesson:"N5",type:"noun"},
+  {kana:"いんしょくてん",kanji:"飲食店",meaning:"restaurant / eatery",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Places ══
+  {kana:"いえ",kanji:"家",meaning:"house / home",lesson:"N5",type:"noun"},
+  {kana:"うち",kanji:"家",meaning:"my home / house / inside",lesson:"N5",type:"noun"},
+  {kana:"へや",kanji:"部屋",meaning:"room",lesson:"N5",type:"noun"},
+  {kana:"たてもの",kanji:"建物",meaning:"building",lesson:"N5",type:"noun"},
+  {kana:"アパート",kanji:"",meaning:"apartment",lesson:"N5",type:"noun"},
+  {kana:"がっこう",kanji:"学校",meaning:"school",lesson:"N5",type:"noun"},
+  {kana:"だいがく",kanji:"大学",meaning:"university",lesson:"N5",type:"noun"},
+  {kana:"びょういん",kanji:"病院",meaning:"hospital",lesson:"N5",type:"noun"},
+  {kana:"ゆうびんきょく",kanji:"郵便局",meaning:"post office",lesson:"N5",type:"noun"},
+  {kana:"ぎんこう",kanji:"銀行",meaning:"bank",lesson:"N5",type:"noun"},
+  {kana:"こうばん",kanji:"交番",meaning:"police box",lesson:"N5",type:"noun"},
+  {kana:"えき",kanji:"駅",meaning:"station",lesson:"N5",type:"noun"},
+  {kana:"くうこう",kanji:"空港",meaning:"airport",lesson:"N5",type:"noun"},
+  {kana:"みせ",kanji:"店",meaning:"shop / store",lesson:"N5",type:"noun"},
+  {kana:"スーパー",kanji:"",meaning:"supermarket",lesson:"N5",type:"noun"},
+  {kana:"デパート",kanji:"",meaning:"department store",lesson:"N5",type:"noun"},
+  {kana:"レストラン",kanji:"",meaning:"restaurant",lesson:"N5",type:"noun"},
+  {kana:"カフェ",kanji:"",meaning:"café",lesson:"N5",type:"noun"},
+  {kana:"ホテル",kanji:"",meaning:"hotel",lesson:"N5",type:"noun"},
+  {kana:"こうえん",kanji:"公園",meaning:"park",lesson:"N5",type:"noun"},
+  {kana:"うみ",kanji:"海",meaning:"sea / ocean",lesson:"N5",type:"noun"},
+  {kana:"やま",kanji:"山",meaning:"mountain",lesson:"N5",type:"noun"},
+  {kana:"かわ",kanji:"川",meaning:"river",lesson:"N5",type:"noun"},
+  {kana:"みち",kanji:"道",meaning:"road / street / way",lesson:"N5",type:"noun"},
+  {kana:"まち",kanji:"町",meaning:"town",lesson:"N5",type:"noun"},
+  {kana:"し",kanji:"市",meaning:"city",lesson:"N5",type:"noun"},
+  {kana:"くに",kanji:"国",meaning:"country",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Transport ══
+  {kana:"でんしゃ",kanji:"電車",meaning:"train",lesson:"N5",type:"noun"},
+  {kana:"しんかんせん",kanji:"新幹線",meaning:"bullet train",lesson:"N5",type:"noun"},
+  {kana:"ちかてつ",kanji:"地下鉄",meaning:"underground / subway",lesson:"N5",type:"noun"},
+  {kana:"バス",kanji:"",meaning:"bus",lesson:"N5",type:"noun"},
+  {kana:"タクシー",kanji:"",meaning:"taxi",lesson:"N5",type:"noun"},
+  {kana:"ひこうき",kanji:"飛行機",meaning:"aeroplane",lesson:"N5",type:"noun"},
+  {kana:"ふね",kanji:"船",meaning:"ship / boat",lesson:"N5",type:"noun"},
+  {kana:"くるま",kanji:"車",meaning:"car",lesson:"N5",type:"noun"},
+  {kana:"じてんしゃ",kanji:"自転車",meaning:"bicycle",lesson:"N5",type:"noun"},
+  {kana:"バイク",kanji:"",meaning:"motorbike",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Time ══
+  {kana:"いま",kanji:"今",meaning:"now",lesson:"N5",type:"noun"},
+  {kana:"きょう",kanji:"今日",meaning:"today",lesson:"N5",type:"noun"},
+  {kana:"あした",kanji:"明日",meaning:"tomorrow",lesson:"N5",type:"noun"},
+  {kana:"きのう",kanji:"昨日",meaning:"yesterday",lesson:"N5",type:"noun"},
+  {kana:"あさって",kanji:"明後日",meaning:"the day after tomorrow",lesson:"N5",type:"noun"},
+  {kana:"おととい",kanji:"一昨日",meaning:"the day before yesterday",lesson:"N5",type:"noun"},
+  {kana:"こんしゅう",kanji:"今週",meaning:"this week",lesson:"N5",type:"noun"},
+  {kana:"らいしゅう",kanji:"来週",meaning:"next week",lesson:"N5",type:"noun"},
+  {kana:"せんしゅう",kanji:"先週",meaning:"last week",lesson:"N5",type:"noun"},
+  {kana:"こんげつ",kanji:"今月",meaning:"this month",lesson:"N5",type:"noun"},
+  {kana:"らいげつ",kanji:"来月",meaning:"next month",lesson:"N5",type:"noun"},
+  {kana:"せんげつ",kanji:"先月",meaning:"last month",lesson:"N5",type:"noun"},
+  {kana:"ことし",kanji:"今年",meaning:"this year",lesson:"N5",type:"noun"},
+  {kana:"らいねん",kanji:"来年",meaning:"next year",lesson:"N5",type:"noun"},
+  {kana:"きょねん",kanji:"去年",meaning:"last year",lesson:"N5",type:"noun"},
+  {kana:"あさ",kanji:"朝",meaning:"morning",lesson:"N5",type:"noun"},
+  {kana:"ひる",kanji:"昼",meaning:"daytime / noon",lesson:"N5",type:"noun"},
+  {kana:"よる",kanji:"夜",meaning:"night / evening",lesson:"N5",type:"noun"},
+  {kana:"ごご",kanji:"午後",meaning:"afternoon / PM",lesson:"N5",type:"noun"},
+  {kana:"ごぜん",kanji:"午前",meaning:"morning / AM",lesson:"N5",type:"noun"},
+  {kana:"まいあさ",kanji:"毎朝",meaning:"every morning",lesson:"N5",type:"noun"},
+  {kana:"まいばん",kanji:"毎晩",meaning:"every evening",lesson:"N5",type:"noun"},
+  {kana:"まいにち",kanji:"毎日",meaning:"every day",lesson:"N5",type:"other"},
+  {kana:"まいしゅう",kanji:"毎週",meaning:"every week",lesson:"N5",type:"noun"},
+  {kana:"まいつき",kanji:"毎月",meaning:"every month",lesson:"N5",type:"noun"},
+  {kana:"まいとし",kanji:"毎年",meaning:"every year",lesson:"N5",type:"noun"},
+  // Specific days
+  {kana:"にちようび",kanji:"日曜日",meaning:"Sunday",lesson:"N5",type:"noun"},
+  {kana:"げつようび",kanji:"月曜日",meaning:"Monday",lesson:"N5",type:"noun"},
+  {kana:"かようび",kanji:"火曜日",meaning:"Tuesday",lesson:"N5",type:"noun"},
+  {kana:"すいようび",kanji:"水曜日",meaning:"Wednesday",lesson:"N5",type:"noun"},
+  {kana:"もくようび",kanji:"木曜日",meaning:"Thursday",lesson:"N5",type:"noun"},
+  {kana:"きんようび",kanji:"金曜日",meaning:"Friday",lesson:"N5",type:"noun"},
+  {kana:"どようび",kanji:"土曜日",meaning:"Saturday",lesson:"N5",type:"noun"},
+  {kana:"しゅうまつ",kanji:"週末",meaning:"weekend",lesson:"N5",type:"noun"},
+  {kana:"へいじつ",kanji:"平日",meaning:"weekday",lesson:"N5",type:"noun"},
+  // Months
+  {kana:"いちがつ",kanji:"一月",meaning:"January",lesson:"N5",type:"noun"},
+  {kana:"にがつ",kanji:"二月",meaning:"February",lesson:"N5",type:"noun"},
+  {kana:"さんがつ",kanji:"三月",meaning:"March",lesson:"N5",type:"noun"},
+  {kana:"しがつ",kanji:"四月",meaning:"April",lesson:"N5",type:"noun"},
+  {kana:"ごがつ",kanji:"五月",meaning:"May",lesson:"N5",type:"noun"},
+  {kana:"ろくがつ",kanji:"六月",meaning:"June",lesson:"N5",type:"noun"},
+  {kana:"しちがつ",kanji:"七月",meaning:"July",lesson:"N5",type:"noun"},
+  {kana:"はちがつ",kanji:"八月",meaning:"August",lesson:"N5",type:"noun"},
+  {kana:"くがつ",kanji:"九月",meaning:"September",lesson:"N5",type:"noun"},
+  {kana:"じゅうがつ",kanji:"十月",meaning:"October",lesson:"N5",type:"noun"},
+  {kana:"じゅういちがつ",kanji:"十一月",meaning:"November",lesson:"N5",type:"noun"},
+  {kana:"じゅうにがつ",kanji:"十二月",meaning:"December",lesson:"N5",type:"noun"},
+  // Seasons
+  {kana:"はる",kanji:"春",meaning:"spring",lesson:"N5",type:"noun"},
+  {kana:"なつ",kanji:"夏",meaning:"summer",lesson:"N5",type:"noun"},
+  {kana:"あき",kanji:"秋",meaning:"autumn / fall",lesson:"N5",type:"noun"},
+  {kana:"ふゆ",kanji:"冬",meaning:"winter",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Food & drink ══
+  {kana:"ごはん",kanji:"ご飯",meaning:"cooked rice / meal",lesson:"N5",type:"noun"},
+  {kana:"パン",kanji:"",meaning:"bread",lesson:"N5",type:"noun"},
+  {kana:"めん",kanji:"麺",meaning:"noodles",lesson:"N5",type:"noun"},
+  {kana:"ラーメン",kanji:"",meaning:"ramen noodles",lesson:"N5",type:"noun"},
+  {kana:"すし",kanji:"寿司",meaning:"sushi",lesson:"N5",type:"noun"},
+  {kana:"てんぷら",kanji:"天ぷら",meaning:"tempura",lesson:"N5",type:"noun"},
+  {kana:"さかな",kanji:"魚",meaning:"fish",lesson:"N5",type:"noun"},
+  {kana:"にく",kanji:"肉",meaning:"meat",lesson:"N5",type:"noun"},
+  {kana:"やさい",kanji:"野菜",meaning:"vegetables",lesson:"N5",type:"noun"},
+  {kana:"くだもの",kanji:"果物",meaning:"fruit",lesson:"N5",type:"noun"},
+  {kana:"たまご",kanji:"卵",meaning:"egg",lesson:"N5",type:"noun"},
+  {kana:"ぎゅうにゅう",kanji:"牛乳",meaning:"milk",lesson:"N5",type:"noun"},
+  {kana:"みず",kanji:"水",meaning:"water",lesson:"N5",type:"noun"},
+  {kana:"おちゃ",kanji:"お茶",meaning:"tea (Japanese)",lesson:"N5",type:"noun"},
+  {kana:"こうちゃ",kanji:"紅茶",meaning:"black tea",lesson:"N5",type:"noun"},
+  {kana:"コーヒー",kanji:"",meaning:"coffee",lesson:"N5",type:"noun"},
+  {kana:"ジュース",kanji:"",meaning:"juice",lesson:"N5",type:"noun"},
+  {kana:"おさけ",kanji:"お酒",meaning:"alcohol / sake",lesson:"N5",type:"noun"},
+  {kana:"ビール",kanji:"",meaning:"beer",lesson:"N5",type:"noun"},
+  {kana:"みそしる",kanji:"味噌汁",meaning:"miso soup",lesson:"N5",type:"noun"},
+  {kana:"おかし",kanji:"お菓子",meaning:"sweets / snacks",lesson:"N5",type:"noun"},
+  {kana:"ケーキ",kanji:"",meaning:"cake",lesson:"N5",type:"noun"},
+  {kana:"アイスクリーム",kanji:"",meaning:"ice cream",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Body ══
+  {kana:"からだ",kanji:"体",meaning:"body",lesson:"N5",type:"noun"},
+  {kana:"あたま",kanji:"頭",meaning:"head",lesson:"N5",type:"noun"},
+  {kana:"かお",kanji:"顔",meaning:"face",lesson:"N5",type:"noun"},
+  {kana:"め",kanji:"目",meaning:"eye",lesson:"N5",type:"noun"},
+  {kana:"みみ",kanji:"耳",meaning:"ear",lesson:"N5",type:"noun"},
+  {kana:"はな",kanji:"鼻",meaning:"nose",lesson:"N5",type:"noun"},
+  {kana:"くち",kanji:"口",meaning:"mouth",lesson:"N5",type:"noun"},
+  {kana:"は",kanji:"歯",meaning:"tooth / teeth",lesson:"N5",type:"noun"},
+  {kana:"かみ",kanji:"髪",meaning:"hair (head)",lesson:"N5",type:"noun"},
+  {kana:"て",kanji:"手",meaning:"hand",lesson:"N5",type:"noun"},
+  {kana:"あし",kanji:"足",meaning:"foot / leg",lesson:"N5",type:"noun"},
+  {kana:"せなか",kanji:"背中",meaning:"back (of body)",lesson:"N5",type:"noun"},
+  {kana:"おなか",kanji:"お腹",meaning:"stomach / belly",lesson:"N5",type:"noun"},
+  {kana:"こえ",kanji:"声",meaning:"voice",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Home & objects ══
+  {kana:"つくえ",kanji:"机",meaning:"desk",lesson:"N5",type:"noun"},
+  {kana:"いす",kanji:"椅子",meaning:"chair",lesson:"N5",type:"noun"},
+  {kana:"テーブル",kanji:"",meaning:"table",lesson:"N5",type:"noun"},
+  {kana:"ベッド",kanji:"",meaning:"bed",lesson:"N5",type:"noun"},
+  {kana:"まど",kanji:"窓",meaning:"window",lesson:"N5",type:"noun"},
+  {kana:"ドア",kanji:"",meaning:"door",lesson:"N5",type:"noun"},
+  {kana:"かべ",kanji:"壁",meaning:"wall",lesson:"N5",type:"noun"},
+  {kana:"ゆか",kanji:"床",meaning:"floor",lesson:"N5",type:"noun"},
+  {kana:"てんじょう",kanji:"天井",meaning:"ceiling",lesson:"N5",type:"noun"},
+  {kana:"でんき",kanji:"電気",meaning:"electricity / light",lesson:"N5",type:"noun"},
+  {kana:"テレビ",kanji:"",meaning:"television",lesson:"N5",type:"noun"},
+  {kana:"ラジオ",kanji:"",meaning:"radio",lesson:"N5",type:"noun"},
+  {kana:"パソコン",kanji:"",meaning:"computer / PC",lesson:"N5",type:"noun"},
+  {kana:"スマホ",kanji:"",meaning:"smartphone",lesson:"N5",type:"noun"},
+  {kana:"でんわ",kanji:"電話",meaning:"telephone",lesson:"N5",type:"noun"},
+  {kana:"かぎ",kanji:"鍵",meaning:"key / lock",lesson:"N5",type:"noun"},
+  {kana:"かばん",kanji:"鞄",meaning:"bag",lesson:"N5",type:"noun"},
+  {kana:"さいふ",kanji:"財布",meaning:"wallet / purse",lesson:"N5",type:"noun"},
+  {kana:"かさ",kanji:"傘",meaning:"umbrella",lesson:"N5",type:"noun"},
+  {kana:"めがね",kanji:"眼鏡",meaning:"glasses / spectacles",lesson:"N5",type:"noun"},
+  {kana:"とけい",kanji:"時計",meaning:"clock / watch",lesson:"N5",type:"noun"},
+  {kana:"しゃしん",kanji:"写真",meaning:"photograph",lesson:"N5",type:"noun"},
+  {kana:"ほん",kanji:"本",meaning:"book",lesson:"N5",type:"noun"},
+  {kana:"ざっし",kanji:"雑誌",meaning:"magazine",lesson:"N5",type:"noun"},
+  {kana:"しんぶん",kanji:"新聞",meaning:"newspaper",lesson:"N5",type:"noun"},
+  {kana:"てがみ",kanji:"手紙",meaning:"letter",lesson:"N5",type:"noun"},
+  {kana:"きって",kanji:"切手",meaning:"stamp (postage)",lesson:"N5",type:"noun"},
+  {kana:"えんぴつ",kanji:"鉛筆",meaning:"pencil",lesson:"N5",type:"noun"},
+  {kana:"ペン",kanji:"",meaning:"pen",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Clothing ══
+  {kana:"ふく",kanji:"服",meaning:"clothes",lesson:"N5",type:"noun"},
+  {kana:"シャツ",kanji:"",meaning:"shirt",lesson:"N5",type:"noun"},
+  {kana:"ズボン",kanji:"",meaning:"trousers / pants",lesson:"N5",type:"noun"},
+  {kana:"スカート",kanji:"",meaning:"skirt",lesson:"N5",type:"noun"},
+  {kana:"コート",kanji:"",meaning:"coat",lesson:"N5",type:"noun"},
+  {kana:"くつ",kanji:"靴",meaning:"shoes",lesson:"N5",type:"noun"},
+  {kana:"くつした",kanji:"靴下",meaning:"socks",lesson:"N5",type:"noun"},
+  {kana:"ぼうし",kanji:"帽子",meaning:"hat / cap",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Nature & weather ══
+  {kana:"てんき",kanji:"天気",meaning:"weather",lesson:"N5",type:"noun"},
+  {kana:"はれ",kanji:"晴れ",meaning:"fine / sunny weather",lesson:"N5",type:"noun"},
+  {kana:"くもり",kanji:"曇り",meaning:"cloudy",lesson:"N5",type:"noun"},
+  {kana:"あめ",kanji:"雨",meaning:"rain",lesson:"N5",type:"noun"},
+  {kana:"ゆき",kanji:"雪",meaning:"snow",lesson:"N5",type:"noun"},
+  {kana:"かぜ",kanji:"風",meaning:"wind",lesson:"N5",type:"noun"},
+  {kana:"たいふう",kanji:"台風",meaning:"typhoon",lesson:"N5",type:"noun"},
+  {kana:"そら",kanji:"空",meaning:"sky",lesson:"N5",type:"noun"},
+  {kana:"たいよう",kanji:"太陽",meaning:"sun",lesson:"N5",type:"noun"},
+  {kana:"つき",kanji:"月",meaning:"moon / month",lesson:"N5",type:"noun"},
+  {kana:"ほし",kanji:"星",meaning:"star",lesson:"N5",type:"noun"},
+  {kana:"き",kanji:"木",meaning:"tree",lesson:"N5",type:"noun"},
+  {kana:"はな",kanji:"花",meaning:"flower",lesson:"N5",type:"noun"},
+  {kana:"くさ",kanji:"草",meaning:"grass",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Animals ══
+  {kana:"いぬ",kanji:"犬",meaning:"dog",lesson:"N5",type:"noun"},
+  {kana:"ねこ",kanji:"猫",meaning:"cat",lesson:"N5",type:"noun"},
+  {kana:"とり",kanji:"鳥",meaning:"bird",lesson:"N5",type:"noun"},
+  {kana:"さかな",kanji:"魚",meaning:"fish",lesson:"N5",type:"noun"},
+  {kana:"うし",kanji:"牛",meaning:"cow",lesson:"N5",type:"noun"},
+  {kana:"ぶた",kanji:"豚",meaning:"pig",lesson:"N5",type:"noun"},
+  {kana:"うま",kanji:"馬",meaning:"horse",lesson:"N5",type:"noun"},
+  {kana:"うさぎ",kanji:"兔",meaning:"rabbit",lesson:"N5",type:"noun"},
+  // ══ N5 ADVERBS & EXPRESSIONS ══
+  {kana:"いつも",kanji:"",meaning:"always",lesson:"N5",type:"other"},
+  {kana:"ときどき",kanji:"時々",meaning:"sometimes",lesson:"N5",type:"other"},
+  {kana:"たまに",kanji:"",meaning:"occasionally / once in a while",lesson:"N5",type:"other"},
+  {kana:"めったに〜ない",kanji:"",meaning:"rarely / seldom",lesson:"N5",type:"other"},
+  {kana:"けっして〜ない",kanji:"決して",meaning:"never / by no means",lesson:"N5",type:"other"},
+  {kana:"もう",kanji:"",meaning:"already / soon",lesson:"N5",type:"other"},
+  {kana:"まだ",kanji:"",meaning:"still / not yet",lesson:"N5",type:"other"},
+  {kana:"また",kanji:"",meaning:"again",lesson:"N5",type:"other"},
+  {kana:"もっと",kanji:"",meaning:"more",lesson:"N5",type:"other"},
+  {kana:"いちばん",kanji:"一番",meaning:"the most / number one",lesson:"N5",type:"other"},
+  {kana:"とても",kanji:"",meaning:"very / extremely",lesson:"N5",type:"other"},
+  {kana:"たいへん",kanji:"大変",meaning:"very / awfully (adverb)",lesson:"N5",type:"other"},
+  {kana:"すこし",kanji:"少し",meaning:"a little / a bit",lesson:"N5",type:"other"},
+  {kana:"ちょっと",kanji:"",meaning:"a little / just a moment",lesson:"N5",type:"other"},
+  {kana:"たくさん",kanji:"",meaning:"a lot / many",lesson:"N5",type:"other"},
+  {kana:"ぜんぜん〜ない",kanji:"全然",meaning:"not at all",lesson:"N5",type:"other"},
+  {kana:"あまり〜ない",kanji:"",meaning:"not very / not much",lesson:"N5",type:"other"},
+  {kana:"はじめて",kanji:"初めて",meaning:"for the first time",lesson:"N5",type:"other"},
+  {kana:"はじめに",kanji:"初めに",meaning:"first of all / at the beginning",lesson:"N5",type:"other"},
+  {kana:"さいご",kanji:"最後",meaning:"last / end",lesson:"N5",type:"other"},
+  {kana:"つぎ",kanji:"次",meaning:"next",lesson:"N5",type:"other"},
+  {kana:"まえ",kanji:"前",meaning:"before / in front of",lesson:"N5",type:"other"},
+  {kana:"あと",kanji:"後",meaning:"after / later / behind",lesson:"N5",type:"other"},
+  {kana:"ゆっくり",kanji:"",meaning:"slowly / leisurely",lesson:"N5",type:"other"},
+  {kana:"はやく",kanji:"早く",meaning:"quickly / early",lesson:"N5",type:"other"},
+  {kana:"いっしょに",kanji:"一緒に",meaning:"together",lesson:"N5",type:"other"},
+  {kana:"ひとりで",kanji:"一人で",meaning:"alone / by oneself",lesson:"N5",type:"other"},
+  {kana:"みんなで",kanji:"皆で",meaning:"all together / everyone",lesson:"N5",type:"other"},
+  {kana:"ここ",kanji:"",meaning:"here",lesson:"N5",type:"other"},
+  {kana:"そこ",kanji:"",meaning:"there",lesson:"N5",type:"other"},
+  {kana:"あそこ",kanji:"",meaning:"over there",lesson:"N5",type:"other"},
+  {kana:"どこ",kanji:"",meaning:"where",lesson:"N5",type:"other"},
+  {kana:"こちら",kanji:"",meaning:"this way / here (polite)",lesson:"N5",type:"other"},
+  {kana:"そちら",kanji:"",meaning:"that way / there (polite)",lesson:"N5",type:"other"},
+  {kana:"あちら",kajai:"",meaning:"over there (polite)",lesson:"N5",type:"other"},
+  {kana:"どちら",kanji:"",meaning:"which way / where (polite)",lesson:"N5",type:"other"},
+  {kana:"これ",kanji:"",meaning:"this (thing)",lesson:"N5",type:"other"},
+  {kana:"それ",kanji:"",meaning:"that (thing)",lesson:"N5",type:"other"},
+  {kana:"あれ",kanji:"",meaning:"that over there",lesson:"N5",type:"other"},
+  {kana:"どれ",kanji:"",meaning:"which (one)",lesson:"N5",type:"other"},
+  {kana:"この",kanji:"",meaning:"this (adj)",lesson:"N5",type:"other"},
+  {kana:"その",kanji:"",meaning:"that (adj)",lesson:"N5",type:"other"},
+  {kana:"あの",kanji:"",meaning:"that over there (adj)",lesson:"N5",type:"other"},
+  {kana:"どの",kanji:"",meaning:"which (adj)",lesson:"N5",type:"other"},
+  {kana:"なぜ",kanji:"",meaning:"why",lesson:"N5",type:"other"},
+  {kana:"どうして",kanji:"",meaning:"why / how come",lesson:"N5",type:"other"},
+  {kana:"どうやって",kanji:"",meaning:"how / by what means",lesson:"N5",type:"other"},
+  {kana:"いくら",kanji:"",meaning:"how much (price)",lesson:"N5",type:"other"},
+  {kana:"いくつ",kanji:"",meaning:"how many / how old",lesson:"N5",type:"other"},
+  {kana:"なんじ",kanji:"何時",meaning:"what time",lesson:"N5",type:"other"},
+  {kana:"どのくらい",kanji:"",meaning:"how long / how much / how far",lesson:"N5",type:"other"},
+  {kana:"どんな",kanji:"",meaning:"what kind of",lesson:"N5",type:"other"},
+  {kana:"よく",kanji:"",meaning:"often / well",lesson:"N5",type:"other"},
+  {kana:"もちろん",kanji:"勿論",meaning:"of course",lesson:"N5",type:"other"},
+  {kana:"だいたい",kanji:"大体",meaning:"mostly / approximately",lesson:"N5",type:"other"},
+  {kana:"ぜひ",kanji:"是非",meaning:"by all means / definitely",lesson:"N5",type:"other"},
+  {kana:"やはり／やっぱり",kanji:"",meaning:"as expected / after all",lesson:"N5",type:"other"},
+  {kana:"でも",kanji:"",meaning:"but / however",lesson:"N5",type:"other"},
+  {kana:"そして",kanji:"",meaning:"and (then) / and also",lesson:"N5",type:"other"},
+  {kana:"それから",kanji:"",meaning:"and then / after that",lesson:"N5",type:"other"},
+  {kana:"だから",kanji:"",meaning:"therefore / so",lesson:"N5",type:"other"},
+  {kana:"でも",kanji:"",meaning:"but / even so",lesson:"N5",type:"other"},
+  {kana:"しかし",kanji:"",meaning:"however / but (formal)",lesson:"N5",type:"other"},
+  // ══ N5 NOUNS — Numbers & counters ══
+  {kana:"ひとつ",kanji:"一つ",meaning:"one (general counter)",lesson:"N5",type:"noun"},
+  {kana:"ふたつ",kanji:"二つ",meaning:"two (general counter)",lesson:"N5",type:"noun"},
+  {kana:"みっつ",kanji:"三つ",meaning:"three (general counter)",lesson:"N5",type:"noun"},
+  {kana:"よっつ",kanji:"四つ",meaning:"four (general counter)",lesson:"N5",type:"noun"},
+  {kana:"いつつ",kanji:"五つ",meaning:"five (general counter)",lesson:"N5",type:"noun"},
+  {kana:"むっつ",kanji:"六つ",meaning:"six (general counter)",lesson:"N5",type:"noun"},
+  {kana:"ななつ",kanji:"七つ",meaning:"seven (general counter)",lesson:"N5",type:"noun"},
+  {kana:"やっつ",kanji:"八つ",meaning:"eight (general counter)",lesson:"N5",type:"noun"},
+  {kana:"ここのつ",kanji:"九つ",meaning:"nine (general counter)",lesson:"N5",type:"noun"},
+  {kana:"とお",kanji:"十",meaning:"ten (general counter)",lesson:"N5",type:"noun"},
+  {kana:"〜ほん",kanji:"〜本",meaning:"counter for long thin objects",lesson:"N5",type:"noun"},
+  {kana:"〜まい",kanji:"〜枚",meaning:"counter for flat things",lesson:"N5",type:"noun"},
+  {kana:"〜だい",kanji:"〜台",meaning:"counter for machines/vehicles",lesson:"N5",type:"noun"},
+  {kana:"〜さつ",kanji:"〜冊",meaning:"counter for bound books",lesson:"N5",type:"noun"},
+  {kana:"〜はい",kanji:"〜杯",meaning:"counter for cups/glasses",lesson:"N5",type:"noun"},
+  {kana:"〜ひき",kanji:"〜匹",meaning:"counter for small animals",lesson:"N5",type:"noun"},
+  {kana:"〜とう",kanji:"〜頭",meaning:"counter for large animals",lesson:"N5",type:"noun"},
+  {kana:"〜にん",kanji:"〜人",meaning:"counter for people",lesson:"N5",type:"noun"},
+  {kana:"〜かい",kanji:"〜回",meaning:"counter for times/occurrences",lesson:"N5",type:"noun"},
+  {kana:"〜かい",kanji:"〜階",meaning:"counter for floors",lesson:"N5",type:"noun"},
+  {kana:"〜えん",kanji:"〜円",meaning:"yen (currency)",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — School & study ══
+  {kana:"じゅぎょう",kanji:"授業",meaning:"lesson / class",lesson:"N5",type:"noun"},
+  {kana:"しゅくだい",kanji:"宿題",meaning:"homework",lesson:"N5",type:"noun"},
+  {kana:"しけん",kanji:"試験",meaning:"exam / test",lesson:"N5",type:"noun"},
+  {kana:"せいせき",kanji:"成績",meaning:"grades / results",lesson:"N5",type:"noun"},
+  {kana:"きょうしつ",kanji:"教室",meaning:"classroom",lesson:"N5",type:"noun"},
+  {kana:"としょかん",kanji:"図書館",meaning:"library",lesson:"N5",type:"noun"},
+  {kana:"きょうかしょ",kanji:"教科書",meaning:"textbook",lesson:"N5",type:"noun"},
+  {kana:"ノート",kanji:"",meaning:"notebook",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Health ══
+  {kana:"びょうき",kanji:"病気",meaning:"illness / sickness",lesson:"N5",type:"noun"},
+  {kana:"かぜ",kanji:"風邪",meaning:"cold (illness)",lesson:"N5",type:"noun"},
+  {kana:"ねつ",kanji:"熱",meaning:"fever / temperature",lesson:"N5",type:"noun"},
+  {kana:"くすり",kanji:"薬",meaning:"medicine",lesson:"N5",type:"noun"},
+  {kana:"いたい",kanji:"痛い",meaning:"pain (ouch!)",lesson:"N5",type:"noun"},
+  // ══ N5 NOUNS — Misc. nouns ══
+  {kana:"こと",kanji:"事",meaning:"thing / fact / matter",lesson:"N5",type:"noun"},
+  {kana:"もの",kanji:"物",meaning:"thing / object",lesson:"N5",type:"noun"},
+  {kana:"ところ",kanji:"所",meaning:"place / situation",lesson:"N5",type:"noun"},
+  {kana:"とき",kanji:"時",meaning:"time / when",lesson:"N5",type:"noun"},
+  {kana:"ほう",kanji:"方",meaning:"direction / way / person",lesson:"N5",type:"noun"},
+  {kana:"ため",kanji:"為",meaning:"for / in order to / because of",lesson:"N5",type:"noun"},
+  {kana:"あいだ",kanji:"間",meaning:"between / while",lesson:"N5",type:"noun"},
+  {kana:"なか",kanji:"中",meaning:"inside / middle",lesson:"N5",type:"noun"},
+  {kana:"そと",kanji:"外",meaning:"outside",lesson:"N5",type:"noun"},
+  {kana:"うえ",kanji:"上",meaning:"above / on top",lesson:"N5",type:"noun"},
+  {kana:"した",kanji:"下",meaning:"below / under",lesson:"N5",type:"noun"},
+  {kana:"まえ",kanji:"前",meaning:"in front of / before",lesson:"N5",type:"noun"},
+  {kana:"うしろ",kanji:"後ろ",meaning:"behind / back",lesson:"N5",type:"noun"},
+  {kana:"となり",kanji:"隣",meaning:"next to / neighbouring",lesson:"N5",type:"noun"},
+  {kana:"ちかく",kanji:"近く",meaning:"nearby / near",lesson:"N5",type:"noun"},
+  {kana:"むこう",kanji:"向こう",meaning:"over there / the far side",lesson:"N5",type:"noun"},
+  {kana:"みぎ",kanji:"右",meaning:"right (direction)",lesson:"N5",type:"noun"},
+  {kana:"ひだり",kanji:"左",meaning:"left (direction)",lesson:"N5",type:"noun"},
+  {kana:"にほんご",kanji:"日本語",meaning:"Japanese language",lesson:"N5",type:"noun"},
+  {kana:"えいご",kanji:"英語",meaning:"English language",lesson:"N5",type:"noun"},
+  {kana:"ことば",kanji:"言葉",meaning:"word / language / expression",lesson:"N5",type:"noun"},
+  {kana:"いみ",kanji:"意味",meaning:"meaning",lesson:"N5",type:"noun"},
+  {kana:"こえ",kanji:"声",meaning:"voice",lesson:"N5",type:"noun"},
+  {kana:"おと",kanji:"音",meaning:"sound / noise",lesson:"N5",type:"noun"},
+  {kana:"いろ",kanji:"色",meaning:"colour",lesson:"N5",type:"noun"},
+  {kana:"かたち",kanji:"形",meaning:"shape / form",lesson:"N5",type:"noun"},
+  {kana:"おかね",kanji:"お金",meaning:"money",lesson:"N5",type:"noun"},
+  {kana:"りょうきん",kanji:"料金",meaning:"fee / charge / fare",lesson:"N5",type:"noun"},
+  {kana:"ねだん",kanji:"値段",meaning:"price",lesson:"N5",type:"noun"},
+  {kana:"しごと",kanji:"仕事",meaning:"work / job",lesson:"N5",type:"noun"},
+  {kana:"かいしゃ",kanji:"会社",meaning:"company / office",lesson:"N5",type:"noun"},
+  {kana:"やすみ",kanji:"休み",meaning:"rest / holiday / day off",lesson:"N5",type:"noun"},
+  {kana:"りょこう",kanji:"旅行",meaning:"travel / trip",lesson:"N5",type:"noun"},
+  {kana:"しゅみ",kanji:"趣味",meaning:"hobby",lesson:"N5",type:"noun"},
+  {kana:"スポーツ",kanji:"",meaning:"sport",lesson:"N5",type:"noun"},
+  {kana:"おんがく",kanji:"音楽",meaning:"music",lesson:"N5",type:"noun"},
+  {kana:"えいが",kanji:"映画",meaning:"film / movie",lesson:"N5",type:"noun"},
+  {kana:"うた",kanji:"歌",meaning:"song",lesson:"N5",type:"noun"},
+  {kana:"パーティー",kanji:"",meaning:"party",lesson:"N5",type:"noun"},
+  {kana:"プレゼント",kanji:"",meaning:"present / gift",lesson:"N5",type:"noun"},
+  {kana:"おみやげ",kanji:"お土産",meaning:"souvenir / gift",lesson:"N5",type:"noun"},
+  // L43
+  {kana:"ほかの",kanji:"他の",meaning:"other",lesson:"L43",type:"adj"},
+  {kana:"ほかに",kanji:"他に",meaning:"anything else",lesson:"L43",type:"other"},
+  {kana:"いままでどおり",kanji:"今まで通り",meaning:"same as before / as always",lesson:"L43",type:"other"},
+  {kana:"しちめんちょう",kanji:"七面鳥",meaning:"turkey",lesson:"L43",type:"noun"},
+  {kana:"おおあめ",kanji:"大雨",meaning:"heavy rain",lesson:"L43",type:"noun"},
+  {kana:"はずれます",kanji:"外れます",meaning:"to come undone / to miss",lesson:"L43",type:"verb"},
+  {kana:"きれます",kanji:"切れます",meaning:"to snap / to run out",lesson:"L43",type:"verb"},
+  {kana:"きえます",kanji:"消えます",meaning:"to disappear / go out",lesson:"L43",type:"verb"},
+  {kana:"たおれます",kanji:"倒れます",meaning:"to fall down / collapse",lesson:"L43",type:"verb"},
+  {kana:"あこがれます",kanji:"憧れます",meaning:"to admire / to yearn for",lesson:"L43",type:"verb"},
+  {kana:"とれます",kanji:"取れます",meaning:"to come off / to be removed",lesson:"L43",type:"verb"},
+  {kana:"がんこな",kanji:"頑固な",meaning:"stubborn",lesson:"L43",type:"adj"},
+  {kana:"せいじつな",kanji:"誠実な",meaning:"sincere / honest",lesson:"L43",type:"adj"},
+  {kana:"みため",kanji:"見た目",meaning:"appearance / looks",lesson:"L43",type:"noun"},
+  {kana:"いんしょう",kanji:"印象",meaning:"impression",lesson:"L43",type:"noun"},
+  // L44
+  {kana:"かちます",kanji:"勝ちます",meaning:"to win",lesson:"L44",type:"verb"},
+  {kana:"まけます",kanji:"負けます",meaning:"to lose",lesson:"L44",type:"verb"},
+  {kana:"おぼえます",kanji:"覚えます",meaning:"to remember / memorise",lesson:"L44",type:"verb"},
+  {kana:"やきざかな",kanji:"焼き魚",meaning:"grilled fish",lesson:"L44",type:"noun"},
+  {kana:"ほね",kanji:"骨",meaning:"bone",lesson:"L44",type:"noun"},
+  {kana:"むくちな",kanji:"無口な",meaning:"quiet / not talkative",lesson:"L44",type:"adj"},
+  {kana:"はなしかけます",kanji:"話しかけます",meaning:"to start talking to someone",lesson:"L44",type:"verb"},
+  {kana:"くもり",kanji:"曇り",meaning:"cloudy",lesson:"L44",type:"noun"},
+  {kana:"せんたくもの",kanji:"洗濯物",meaning:"laundry",lesson:"L44",type:"noun"},
+  {kana:"かわきます",kanji:"乾きます",meaning:"to dry",lesson:"L44",type:"verb"},
+  {kana:"じゅぎょう",kanji:"授業",meaning:"lesson / class",lesson:"L44",type:"noun"},
+  {kana:"せつめいします",kanji:"説明します",meaning:"to explain",lesson:"L44",type:"verb"},
+  {kana:"せまい",kanji:"狭い",meaning:"narrow / cramped",lesson:"L44",type:"adj"},
+  {kana:"じょうぶな",kanji:"丈夫な",meaning:"durable / sturdy",lesson:"L44",type:"adj"},
+  {kana:"こわれます",kanji:"壊れます",meaning:"to break (intransitive)",lesson:"L44",type:"verb"},
+  {kana:"そうだんします",kanji:"相談します",meaning:"to consult / discuss",lesson:"L44",type:"verb"},
+  {kana:"なやみ",kanji:"悩み",meaning:"worry / problem",lesson:"L44",type:"noun"},
+  {kana:"じゅうたい",kanji:"渋滞",meaning:"traffic congestion",lesson:"L44",type:"noun"},
+  {kana:"とおります",kanji:"通ります",meaning:"to pass through / go via",lesson:"L44",type:"verb"},
+  {kana:"きょうかしょ",kanji:"教科書",meaning:"textbook",lesson:"L44",type:"noun"},
+  {kana:"ちゅうい",kanji:"注意",meaning:"caution / warning",lesson:"L44",type:"noun"},
+  {kana:"まちがえます",kanji:"間違えます",meaning:"to make a mistake",lesson:"L44",type:"verb"},
+  {kana:"しょしんしゃ",kanji:"初心者",meaning:"beginner",lesson:"L44",type:"noun"},
+  {kana:"かんきょう",kanji:"環境",meaning:"environment",lesson:"L44",type:"noun"},
+  {kana:"しょくば",kanji:"職場",meaning:"workplace",lesson:"L44",type:"noun"},
+  {kana:"としをとります",kanji:"年を取ります",meaning:"to age / get older",lesson:"L44",type:"verb"},
+  {kana:"はこびます",kanji:"運びます",meaning:"to carry",lesson:"L44",type:"verb"},
+  {kana:"きかい",kanji:"機械",meaning:"machine",lesson:"L44",type:"noun"},
+  {kana:"じこ",kanji:"事故",meaning:"accident",lesson:"L44",type:"noun"},
+  {kana:"すべります",kanji:"滑ります",meaning:"to slip / slide",lesson:"L44",type:"verb"},
+  {kana:"こうさてん",kanji:"交差点",meaning:"crossroads / intersection",lesson:"L44",type:"noun"},
+  {kana:"ほうりつ",kanji:"法律",meaning:"law",lesson:"L44",type:"noun"},
+  {kana:"きびしい",kanji:"厳しい",meaning:"strict / harsh",lesson:"L44",type:"adj"},
+  {kana:"めずらしい",kanji:"珍しい",meaning:"rare / unusual",lesson:"L44",type:"adj"},
+  {kana:"なきます",kanji:"泣きます",meaning:"to cry",lesson:"L44",type:"verb"},
+  {kana:"わらいます",kanji:"笑います",meaning:"to laugh",lesson:"L44",type:"verb"},
+  {kana:"いれます",kanji:"入れます",meaning:"to put in",lesson:"L44",type:"verb"},
+  {kana:"さとう",kanji:"砂糖",meaning:"sugar",lesson:"L44",type:"noun"},
+  {kana:"うわぎ",kanji:"上着",meaning:"jacket / top",lesson:"L44",type:"noun"},
+  {kana:"うなぎ",kanji:"鰻",meaning:"eel",lesson:"L44",type:"noun"},
+  {kana:"うすい",kanji:"薄い",meaning:"thin / light (colour/taste)",lesson:"L44",type:"adj"},
+  {kana:"ほそい",kanji:"細い",meaning:"slender / thin",lesson:"L44",type:"adj"},
+  {kana:"ふくざつな",kanji:"複雑な",meaning:"complicated",lesson:"L44",type:"adj"},
+  {kana:"やちん",kanji:"家賃",meaning:"rent",lesson:"L44",type:"noun"},
+  {kana:"へります",kanji:"減ります",meaning:"to decrease",lesson:"L44",type:"verb"},
+  {kana:"にんきがある",kanji:"人気がある",meaning:"to be popular",lesson:"L44",type:"other"},
+  {kana:"しんせき",kanji:"親戚",meaning:"relatives",lesson:"L44",type:"noun"},
+  // L45
+  {kana:"ひつような",kanji:"必要な",meaning:"necessary / needed",lesson:"L45",type:"adj"},
+  {kana:"かじ",kanji:"火事",meaning:"fire (emergency)",lesson:"L45",type:"noun"},
+  {kana:"じけん",kanji:"事件",meaning:"incident / crime",lesson:"L45",type:"noun"},
+  {kana:"じしん",kanji:"地震",meaning:"earthquake",lesson:"L45",type:"noun"},
+  {kana:"そくたつ",kanji:"速達",meaning:"special delivery",lesson:"L45",type:"noun"},
+  {kana:"かかります",kanji:"",meaning:"to take (time/cost)",lesson:"L45",type:"verb"},
+  {kana:"うんどうします",kanji:"運動します",meaning:"to exercise",lesson:"L45",type:"verb"},
+  {kana:"うんどうかい",kanji:"運動会",meaning:"sports day",lesson:"L45",type:"noun"},
+  {kana:"いっしょうけんめい",kanji:"一生懸命",meaning:"with all one's effort",lesson:"L45",type:"other"},
+  {kana:"ちゅうし",kanji:"中止",meaning:"cancellation",lesson:"L45",type:"noun"},
+  {kana:"ふとります",kanji:"太ります",meaning:"to put on weight",lesson:"L45",type:"verb"},
+  {kana:"やせます",kanji:"痩せます",meaning:"to lose weight",lesson:"L45",type:"verb"},
+  {kana:"きゅうりょう",kanji:"給料",meaning:"salary",lesson:"L45",type:"noun"},
+  {kana:"わすれます",kanji:"忘れます",meaning:"to forget",lesson:"L45",type:"verb"},
+  {kana:"やくそく",kanji:"約束",meaning:"promise / arrangement",lesson:"L45",type:"noun"},
+  {kana:"ちょうど",kanji:"",meaning:"just / exactly",lesson:"L45",type:"other"},
+  {kana:"これから",kanji:"",meaning:"from now on",lesson:"L45",type:"other"},
+  {kana:"しあい",kanji:"試合",meaning:"match / game",lesson:"L45",type:"noun"},
+  {kana:"はじまります",kanji:"始まります",meaning:"to start / begin",lesson:"L45",type:"verb"},
+  {kana:"へんじ",kanji:"返事",meaning:"reply / response",lesson:"L45",type:"noun"},
+  {kana:"つたえます",kanji:"伝えます",meaning:"to convey / tell",lesson:"L45",type:"verb"},
+  {kana:"まず",kanji:"",meaning:"first of all",lesson:"L45",type:"other"},
+  {kana:"ねんれい",kanji:"年齢",meaning:"age (of a person)",lesson:"L45",type:"noun"},
+  {kana:"ようす",kanji:"様子",meaning:"appearance / situation",lesson:"L45",type:"noun"},
+  {kana:"そば",kanji:"",meaning:"close to / near",lesson:"L45",type:"other"},
+  {kana:"しばらく",kanji:"",meaning:"for a while",lesson:"L45",type:"other"},
+  {kana:"やくにたつ",kanji:"役に立つ",meaning:"to be useful",lesson:"L45",type:"verb"},
+  {kana:"ふこうちゅうのさいわい",kanji:"不幸中の幸い",meaning:"silver lining",lesson:"L45",type:"other"},
+  {kana:"ひじょうぐち",kanji:"非常口",meaning:"emergency exit",lesson:"L45",type:"noun"},
+  {kana:"きもちがおちつきます",kanji:"気持ちが落ち着きます",meaning:"to calm down",lesson:"L45",type:"verb"},
+  {kana:"さんしょう",kanji:"山椒",meaning:"Japanese pepper (sansho)",lesson:"L45",type:"noun"},
+  // L46
+  {kana:"ひっこします",kanji:"引っ越します",meaning:"to move house",lesson:"L46",type:"verb"},
+  {kana:"めいわくをかけます",kanji:"迷惑をかけます",meaning:"to cause trouble / inconvenience",lesson:"L46",type:"verb"},
+  {kana:"おそくなります",kanji:"遅くなります",meaning:"to be late / become late",lesson:"L46",type:"verb"},
+];
+
+// Grammar fill-in questions
+const GRAMMAR_QZ = [
+  {q:"やまというかんじは おぼえ___です。（easy to remember）",hint:"やすい/にくい",ans:"やすい",lesson:"L44"},
+  {q:"このくつはあるき___です。（hard to walk in）",hint:"やすい/にくい",ans:"にくい",lesson:"L44"},
+  {q:"たべ___て、おなかがいたいです。（too much）",hint:"すぎます form",ans:"すぎ",lesson:"L44"},
+  {q:"かじの___は、１１９ばんにでんわしてください。",hint:"場合は",ans:"ばあい",lesson:"L45"},
+  {q:"べんきょうした___、しけんにおちました。（even though）",hint:"のに",ans:"のに",lesson:"L45"},
+  {q:"ちょうどいまからしあいがはじまる___です。（just about to）",hint:"ところ",ans:"ところ",lesson:"L45"},
+  {q:"にほんにきた___です。（just came）",hint:"ばかり",ans:"ばかり",lesson:"L46"},
+  {q:"おそくなって___。（I'm sorry for being late）",hint:"すみません",ans:"すみません",lesson:"L46"},
+  {q:"わたし___、にほんごはむずかしいです。（for me）",hint:"にとって",ans:"にとって",lesson:"L44"},
+  {q:"このカメラはしょしんしゃにとってつかい___です。（easy to use）",hint:"やすい",ans:"やすい",lesson:"L44"},
+];
+
+// ═══════════════════════════════════════════════════════════
+// READINGS
+// ═══════════════════════════════════════════════════════════
+const READINGS = [
+  { title:"第44課 · カレー", lesson:"L44",
+    text:`カレーライスを<ruby>食<rt>た</rt></ruby>べたことがありますか。カレーは、インドなどアジアのいろいろな<ruby>国<rt>くに</rt></ruby>でよく<ruby>食<rt>た</rt></ruby>べられています。<ruby>日本<rt>にほん</rt></ruby>では<ruby>白<rt>しろ</rt></ruby>いごはんの<ruby>上<rt>うえ</rt></ruby>にカレーをかけて<ruby>食<rt>た</rt></ruby>べるカレーライスが<ruby>多<rt>おお</rt></ruby>いです。カレーは<ruby>明治<rt>めいじ</rt></ruby><ruby>時代<rt>じだい</rt></ruby>の<ruby>初<rt>はじ</rt></ruby>めにイギリスから<ruby>日本<rt>にほん</rt></ruby>に<ruby>紹介<rt>しょうかい</rt></ruby>されました。`,
+    questions:["カレーはどこから日本にきましたか。","日本のカレーはどうやって食べますか。","カレーライスはいつごろ日本人に広まりましたか。"] },
+  { title:"第45課 · 非常の場合", lesson:"L45",
+    text:`<ruby>火事<rt>かじ</rt></ruby>の<ruby>場合<rt>ばあい</rt></ruby>は、１１９<ruby>番<rt>ばん</rt></ruby>に<ruby>電話<rt>でんわ</rt></ruby>してください。<ruby>事件<rt>じけん</rt></ruby>の<ruby>場合<rt>ばあい</rt></ruby>は、１１０<ruby>番<rt>ばん</rt></ruby>に<ruby>電話<rt>でんわ</rt></ruby>してください。<ruby>番号<rt>ばんごう</rt></ruby>がわからない<ruby>場合<rt>ばあい</rt></ruby>は、１１３<ruby>番<rt>ばん</rt></ruby>に<ruby>電話<rt>でんわ</rt></ruby>してください。<ruby>地震<rt>じしん</rt></ruby>の<ruby>場合<rt>ばあい</rt></ruby>は、エレベーターを<ruby>使<rt>つか</rt></ruby>わないでください。まず、<ruby>非常口<rt>ひじょうぐち</rt></ruby>を<ruby>確認<rt>かくにん</rt></ruby>してください。`,
+    questions:["火事のばあい、なんばんにでんわしますか。","地震のばあい、なにをしてはいけませんか。","番号がわからないばあい、どうしますか。"] },
+];
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  if (id==='vocab')    renderVocab();
+  if (id==='grammar')  renderGrammar();
+  if (id==='kanji')    renderKanji();
+  if (id==='quiz')     initQuizSetup();
+  if (id==='reading')   renderReadings();
+  if (id==='dashboard') renderDashboard();
+  if (id==='katakana')  renderKtChart();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SUPABASE — auth + progress sync
+// ═══════════════════════════════════════════════════════════
+const SB_URL  = 'https://zvxpzudgplwuyygdflay.supabase.co';
+const SB_KEY  = 'sb_publishable__CtO_2jMbw8-LIutnjfRWQ_-rB4Pxet';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let CURRENT_USER = null;
+let authMode = 'signin'; // 'signin' | 'signup'
+
+// ── STATUS object (in-memory, synced to Supabase + localStorage fallback) ──
+let STATUS = {};
+try { STATUS = JSON.parse(localStorage.getItem('jlpt_status')||'{}'); } catch(e){}
+
+function setSyncState(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + state;
+  if (lbl) lbl.textContent = label;
+}
+
+// ── Auth UI ──
+function authToggleMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  document.getElementById('auth-btn').textContent   = authMode === 'signin' ? 'Sign in' : 'Create account';
+  document.getElementById('auth-switch-text').innerHTML = authMode === 'signin'
+    ? 'No account? <a onclick="authToggleMode()">Create one</a>'
+    : 'Already have one? <a onclick="authToggleMode()">Sign in</a>';
+  document.getElementById('auth-err').textContent = '';
+}
+
+async function authSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass  = document.getElementById('auth-pass').value;
+  const errEl = document.getElementById('auth-err');
+  const btn   = document.getElementById('auth-btn');
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; return; }
+  btn.textContent = '…'; btn.disabled = true;
+  const fn = authMode === 'signin'
+    ? sb.auth.signInWithPassword({ email, password: pass })
+    : sb.auth.signUp({ email, password: pass });
+  const { data, error } = await fn;
+  btn.disabled = false;
+  btn.textContent = authMode === 'signin' ? 'Sign in' : 'Create account';
+  if (error) { errEl.textContent = error.message; return; }
+  if (authMode === 'signup' && !data.session) {
+    errEl.style.color = 'var(--green)';
+    errEl.textContent = 'Check your email to confirm your account, then sign in.';
+    authMode = 'signin';
+    return;
+  }
+  await onSignedIn(data.user);
+}
+
+async function onSignedIn(user) {
+  CURRENT_USER = user;
+  document.getElementById('auth-overlay').style.display = 'none';
+  setSyncState('syncing', 'Loading…');
+  await loadProgressFromSupabase();
+  setSyncState('synced', user.email);
+  renderDashboard();
+}
+
+async function authSignOut() {
+  await sb.auth.signOut();
+  CURRENT_USER = null;
+  STATUS = {};
+  setSyncState('', '—');
+  document.getElementById('auth-overlay').style.display = 'flex';
+  document.getElementById('auth-err').textContent = '';
+  document.getElementById('auth-err').style.color = 'var(--red)';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-pass').value = '';
+}
+
+// ── Load all progress from Supabase ──
+async function loadProgressFromSupabase() {
+  if (!CURRENT_USER) return;
+  const { data, error } = await sb
+    .from('progress')
+    .select('item_id, status')
+    .eq('user_id', CURRENT_USER.id);
+  if (error) { console.error('Load error', error); return; }
+  STATUS = {};
+  data.forEach(row => { if (row.status) STATUS[row.item_id] = row.status; });
+  // also save to localStorage as offline fallback
+  try { localStorage.setItem('jlpt_status', JSON.stringify(STATUS)); } catch(e){}
+}
+
+// ── Save a single status change ──
+async function saveStatus(itemId, newStatus) {
+  // update local
+  STATUS[itemId] = newStatus;
+  try { localStorage.setItem('jlpt_status', JSON.stringify(STATUS)); } catch(e){}
+  if (!CURRENT_USER) return;
+  setSyncState('syncing', 'Saving…');
+  const { error } = await sb.from('progress').upsert({
+    user_id:    CURRENT_USER.id,
+    item_id:    itemId,
+    status:     newStatus,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id,item_id' });
+  if (error) { setSyncState('error', 'Sync error'); console.error(error); }
+  else        { setSyncState('synced', CURRENT_USER.email); }
+}
+
+function setStatus(e, id, newState, cardClass) {
+  e.stopPropagation();
+  const current = STATUS[id];
+  const next = current === newState ? '' : newState;
+  saveStatus(id, next);
+  // update card in-place
+  const card = e.target.closest('.'+cardClass);
+  if (card) {
+    card.classList.remove('is-mastered','is-review');
+    if (next==='mastered') card.classList.add('is-mastered');
+    if (next==='review')   card.classList.add('is-review');
+    const ms=card.querySelector('.mastered-stamp'), rs=card.querySelector('.review-stamp');
+    if (ms) ms.style.display = next==='mastered'?'block':'none';
+    if (rs) rs.style.display = next==='review'?'block':'none';
+  }
+  updateDashboardStats();
+}
+
+// ── Check for existing session on load ──
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    await onSignedIn(session.user);
+  }
+  // if no session, overlay stays visible
+}
+initAuth();
+
+
+function updateDashboardStats(){ if(document.getElementById('page-dashboard').classList.contains('active')) renderDashboard(); }
+
+function renderDashboard() {
+  const masteredV = VOCAB.filter(v=>STATUS['v:'+v.kana+':'+v.lesson]==='mastered').length;
+  const masteredG = GRAMMAR.filter(g=>STATUS['g:'+g.id]==='mastered').length;
+  const masteredK = KANJI.filter(k=>STATUS['k:'+k.ch]==='mastered').length;
+  const reviewV   = VOCAB.filter(v=>STATUS['v:'+v.kana+':'+v.lesson]==='review').length;
+
+  document.getElementById('stats-row').innerHTML = [
+    [VOCAB.length,   'Vocabulary',     masteredV, reviewV],
+    [GRAMMAR.length, 'Grammar',        masteredG, null],
+    [KANJI.length,   'Kanji',          masteredK, null],
+    [READINGS.length,'Reading texts',  null,      null],
+  ].map(([n,l,m,r])=>{
+    const prog = m!==null ? `<div style="margin-top:5px;font-size:.61rem;color:var(--grey)">
+      <span style="color:var(--green)">✓ ${m}</span> mastered
+      ${r!==null?`· <span style="color:var(--gold)">↺ ${r}</span> review`:''}
+    </div>` : '';
+    const pct = m!==null ? Math.round(m/n*100) : 0;
+    const bar = m!==null ? `<div style="margin-top:7px;height:3px;background:var(--border);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--green);border-radius:99px"></div></div>` : '';
+    return `<div class="stat-card"><div class="n">${n}</div><div class="l">${l}</div>${prog}${bar}</div>`;
+  }).join('');
+
+  document.getElementById('lesson-grid').innerHTML = Object.entries(LESSONS).map(([k,v])=>{
+    const gTags = GRAMMAR.filter(g=>g.lesson===k).map(g=>`<span class="tag tag-red">${g.pattern}</span>`).join('');
+    const vn = VOCAB.filter(x=>x.lesson===k).length;
+    return `<div class="lesson-card" onclick="jumpToLesson('${k}')">
+      <div class="lnum">${k} · ${v.date} · <span class="tag tag-${v.level==='N5'?'blue':'gold'}">${v.level}</span></div>
+      <h3>${v.title}</h3>
+      <div class="tag-row">${gTags}<span class="tag tag-green">${vn} vocab</span></div>
+    </div>`;
+  }).join('');
+}
+function jumpToLesson(k){
+  document.getElementById('v-lesson').value=k;
+  document.querySelector('nav .tab:nth-child(2)').click();
+}
+
+// ═══════════════════════════════════════════════════════════
+// VOCAB
+// ═══════════════════════════════════════════════════════════
+function renderVocab(){
+  const sel=document.getElementById('v-lesson');
+  if(sel.options.length<2) Object.keys(LESSONS).forEach(k=>{const o=new Option(`${k} — ${LESSONS[k].title}`,k);sel.add(o);});
+  const s=document.getElementById('v-search').value.toLowerCase();
+  const lf=document.getElementById('v-lesson').value;
+  const tf=document.getElementById('v-type').value;
+  const sf=document.getElementById('v-status').value;
+  const list=VOCAB.filter(v=>{
+    if(lf&&v.lesson!==lf) return false;
+    if(tf&&v.type!==tf) return false;
+    const id='v:'+v.kana+':'+v.lesson;
+    if(sf==='mastered'&&STATUS[id]!=='mastered') return false;
+    if(sf==='review'&&STATUS[id]!=='review') return false;
+    if(s&&!v.kana.includes(s)&&!(v.kanji||'').includes(s)&&!v.meaning.toLowerCase().includes(s)) return false;
+    return true;
+  });
+  document.getElementById('v-count').textContent=`${list.length} items`;
+  const g=document.getElementById('vocab-grid');
+  if(!list.length){g.innerHTML='<div class="empty"><div class="big">🔍</div>No results.</div>';return;}
+  g.innerHTML=list.map(v=>{
+    const id='v:'+v.kana+':'+v.lesson;
+    const st=STATUS[id]||'';
+    return `<div class="vocab-card ${st==='mastered'?'is-mastered':st==='review'?'is-review':''}" data-id="${id}" onclick="flipVocab(event,this)">
+      <div class="mastered-stamp">✓ mastered</div>
+      <div class="review-stamp">↺ review</div>
+      <div class="vc-lesson">${v.lesson}</div>
+      <div class="vc-kana">${v.kana}</div>
+      ${v.kanji?`<div class="vc-kanji">${v.kanji}</div>`:''}
+      <div class="vc-meaning">${v.meaning}</div>
+      <div class="vc-type"><span class="tag tag-${typeColour(v.type)}">${v.type}</span></div>
+      <div class="vc-hint">tap to reveal</div>
+      <div class="status-btns">
+        <button class="status-btn mastered-btn" onclick="setStatus(event,'${id}','mastered','vocab-card')">✓ Done</button>
+        <button class="status-btn review-btn"   onclick="setStatus(event,'${id}','review','vocab-card')">↺ Review</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function flipVocab(e,el){
+  if(e.target.closest('.status-btn')) return;
+  const m=el.querySelector('.vc-meaning'), h=el.querySelector('.vc-hint');
+  const show=m.style.display!=='block';
+  m.style.display=show?'block':'none';
+  h.style.display=show?'none':'block';
+}
+function typeColour(t){return{verb:'blue',adj:'purple',noun:'green',other:'gold'}[t]||'grey';}
+
+// ═══════════════════════════════════════════════════════════
+// GRAMMAR
+// ═══════════════════════════════════════════════════════════
+function renderGrammar(){
+  const sel=document.getElementById('g-lesson');
+  if(sel.options.length<2) Object.keys(LESSONS).forEach(k=>{sel.add(new Option(k,k));});
+  const s=document.getElementById('g-search').value.toLowerCase();
+  const lvl=document.getElementById('g-level').value;
+  const lf=document.getElementById('g-lesson').value;
+  const sf=document.getElementById('g-status').value;
+  const list=GRAMMAR.filter(g=>{
+    if(lvl&&g.level!==lvl) return false;
+    if(lf&&g.lesson!==lf) return false;
+    const id='g:'+g.id;
+    if(sf==='mastered'&&STATUS[id]!=='mastered') return false;
+    if(sf==='review'&&STATUS[id]!=='review') return false;
+    if(s&&!g.pattern.toLowerCase().includes(s)&&!g.meaning.toLowerCase().includes(s)) return false;
+    return true;
+  });
+  document.getElementById('g-count').textContent=`${list.length} patterns`;
+  const el=document.getElementById('grammar-list');
+  if(!list.length){el.innerHTML='<div class="empty"><div class="big">🔍</div>No results.</div>';return;}
+  el.innerHTML=list.map(g=>{
+    const id='g:'+g.id;
+    const st=STATUS[id]||'';
+    return `<div class="grammar-card ${st==='mastered'?'is-mastered':st==='review'?'is-review':''}" data-id="${id}">
+      <div class="gc-level"><span class="tag tag-${g.level==='N5'?'blue':'gold'}">${g.level}</span> ${g.lesson} · ${LESSONS[g.lesson]?.title||''}</div>
+      <div class="gc-pattern">${g.pattern}</div>
+      <div class="gc-meaning">${g.meaning}</div>
+      <div class="gc-formation">${g.formation}</div>
+      <details>
+        <summary>例文 Examples (${g.examples.length})</summary>
+        <div class="gc-examples" style="margin-top:10px">
+          ${g.examples.map(e=>`<div class="gc-ex"><div class="jp">・${e.jp}</div><div class="en">${e.en}</div></div>`).join('')}
+        </div>
+      </details>
+      <div class="status-btns" style="margin-top:12px">
+        <button class="status-btn mastered-btn" onclick="setStatus(event,'${id}','mastered','grammar-card')">✓ Mastered</button>
+        <button class="status-btn review-btn"   onclick="setStatus(event,'${id}','review','grammar-card')">↺ Review again</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KANJI
+// ═══════════════════════════════════════════════════════════
+function renderKanji(){
+  const s=document.getElementById('k-search').value.toLowerCase();
+  const lv=document.getElementById('k-level').value;
+  const sf=document.getElementById('k-status').value;
+  const normLv = lv==='N4 (from lessons)'?'N4':lv;
+  const list=KANJI.filter(k=>{
+    if(normLv&&k.level!==normLv) return false;
+    const id='k:'+k.ch;
+    if(sf==='mastered'&&STATUS[id]!=='mastered') return false;
+    if(sf==='review'&&STATUS[id]!=='review') return false;
+    if(s&&!k.ch.includes(s)&&!k.on.toLowerCase().includes(s)&&!k.kun.toLowerCase().includes(s)&&!k.meaning.toLowerCase().includes(s)) return false;
+    return true;
+  });
+  document.getElementById('k-count').textContent=`${list.length} kanji`;
+  const g=document.getElementById('kanji-grid');
+  if(!list.length){g.innerHTML='<div class="empty"><div class="big">🔍</div>No results.</div>';return;}
+  g.innerHTML=list.map(k=>{
+    const id='k:'+k.ch;
+    const st=STATUS[id]||'';
+    return `<div class="kanji-card ${st==='mastered'?'is-mastered':st==='review'?'is-review':''}" data-id="${id}" onclick="flipKanji(event,this)">
+      <div class="kc-level"><span class="tag tag-${k.level==='N5'?'blue':'gold'}">${k.level}</span></div>
+      <div class="kc-char">${k.ch}</div>
+      <div class="kc-on">音：${k.on}</div>
+      <div class="kc-kun">訓：${k.kun||'—'}</div>
+      <div class="kc-meaning">${k.meaning}</div>
+      <div class="kc-hint">tap to reveal</div>
+      <div class="kc-strokes">${k.strokes}画</div>
+      <div class="status-btns" style="margin-top:8px">
+        <button class="status-btn mastered-btn" onclick="setStatus(event,'${id}','mastered','kanji-card')" title="Mastered">✓</button>
+        <button class="status-btn review-btn"   onclick="setStatus(event,'${id}','review','kanji-card')"   title="Review again">↺</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function flipKanji(e,el){
+  if(e.target.closest('.status-btn')) return;
+  const m=el.querySelector('.kc-meaning'), h=el.querySelector('.kc-hint');
+  const show=m.style.display!=='block';
+  m.style.display=show?'block':'none';
+  h.style.display=show?'none':'block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════════
+let QZ={q:[],idx:0,score:0,results:[],wrongs:[],numQ:10};
+
+function initQuizSetup(){
+  const c=document.getElementById('qz-lesson-pills');
+  if(c.children.length) return;
+  Object.entries(LESSONS).forEach(([k,v])=>{
+    const l=document.createElement('label');
+    l.className='pill on'; l.dataset.val=k;
+    l.innerHTML=`<input type="checkbox" value="${k}" checked>${k}`;
+    l.onclick=()=>l.classList.toggle('on');
+    c.appendChild(l);
+  });
+  // num pills toggle
+  document.querySelectorAll('#qz-num-pills .pill').forEach(p=>{
+    p.onclick=()=>{
+      document.querySelectorAll('#qz-num-pills .pill').forEach(x=>x.classList.remove('on-blue'));
+      p.classList.add('on-blue');
+      QZ.numQ = p.dataset.num==='all'?'all':+p.dataset.num;
+    };
+  });
+}
+
+function startQuiz(){
+  const modes=[...document.querySelectorAll('#qz-mode-pills .pill.on')].map(p=>p.dataset.val);
+  const lessons=[...document.querySelectorAll('#qz-lesson-pills .pill.on')].map(p=>p.dataset.val);
+  if(!modes.length||!lessons.length){alert('せんせーい！Please select at least one mode and one lesson.');return;}
+
+  let pool=[];
+  if(modes.includes('grammar')){pool=[...GRAMMAR_QZ.filter(q=>lessons.includes(q.lesson))].map(q=>({type:'grammar',q:q.q,ans:q.ans,hint:q.hint,lbl:'文法 fill in the blank'}));}
+  const vpool=VOCAB.filter(v=>lessons.includes(v.lesson));
+  vpool.forEach(v=>{
+    if(modes.includes('kana-meaning')&&v.kana) pool.push({type:'kana-meaning',q:v.kana+(v.kanji?'（'+v.kanji+'）':''),ans:v.meaning,lbl:'Meaning?',badge:'Kana → Meaning'});
+    if(modes.includes('meaning-kana')&&v.meaning) pool.push({type:'meaning-kana',q:v.meaning,ans:v.kana,lbl:'Kana reading?',badge:'Meaning → Kana'});
+    if(modes.includes('kanji-kana')&&v.kanji) pool.push({type:'kanji-kana',q:v.kanji,sub:v.meaning,ans:v.kana,lbl:'Reading (kana)?',badge:'Kanji → Reading'});
+  });
+
+  if(!pool.length){alert('No questions for those settings. Try different options!');return;}
+  pool=pool.sort(()=>Math.random()-.5);
+  const n=QZ.numQ==='all'?pool.length:Math.min(QZ.numQ,pool.length);
+  QZ={q:pool.slice(0,n),idx:0,score:0,results:[],wrongs:[],numQ:QZ.numQ};
+
+  document.getElementById('qz-setup').style.display='none';
+  document.getElementById('qz-score').style.display='none';
+  document.getElementById('qz-active').style.display='block';
+  showQ();
+}
+
+function showQ(){
+  const q=QZ.q[QZ.idx];
+  document.getElementById('qz-ctr').textContent=`Q ${QZ.idx+1} / ${QZ.q.length}`;
+  document.getElementById('q-lbl').textContent=q.lbl;
+  document.getElementById('q-main').textContent=q.q;
+  document.getElementById('q-sub').textContent=q.sub||'';
+  document.getElementById('q-badge').innerHTML=q.badge?`<span class="tag tag-grey">${q.badge}</span>`:(q.hint?`<span class="tag tag-gold">ヒント: ${q.hint}</span>`:'');
+  const inp=document.getElementById('qz-inp');
+  inp.value=''; inp.className='quiz-inp'; inp.disabled=false;
+  const fb=document.getElementById('qz-fb'); fb.className='feedback'; fb.textContent='';
+  document.getElementById('btn-check').style.display='inline-block';
+  document.getElementById('btn-skip').style.display='inline-block';
+  document.getElementById('btn-next').style.display='none';
+  renderDots();
+  setTimeout(()=>inp.focus(),50);
+}
+
+function renderDots(){
+  document.getElementById('qz-dots').innerHTML=QZ.q.map((_,i)=>{
+    let c='dot';
+    if(i<QZ.idx) c+= QZ.results[i]?' ok':' bad';
+    else if(i===QZ.idx) c+=' cur';
+    return `<div class="${c}"></div>`;
+  }).join('');
+}
+
+function checkAns(){
+  const q=QZ.q[QZ.idx];
+  const user=document.getElementById('qz-inp').value.trim().toLowerCase();
+  const correct=q.ans.toLowerCase();
+  // flexible matching for meaning answers (partial ok if >3 chars)
+  const ok = user===correct || (q.type==='kana-meaning'&&correct.includes(user)&&user.length>3);
+  QZ.results[QZ.idx]=ok;
+  if(ok) QZ.score++; else QZ.wrongs.push({q:q.q,ans:q.ans,user});
+  const inp=document.getElementById('qz-inp');
+  inp.className='quiz-inp '+(ok?'ok':'bad'); inp.disabled=true;
+  const fb=document.getElementById('qz-fb');
+  fb.className='feedback show '+(ok?'ok':'bad');
+  fb.textContent=ok?'✓ せいかい！Correct!':'✗ こたえ: '+q.ans;
+  document.getElementById('btn-check').style.display='none';
+  document.getElementById('btn-skip').style.display='none';
+  document.getElementById('btn-next').style.display='inline-block';
+  if(QZ.idx===QZ.q.length-1) document.getElementById('btn-next').textContent='Results →';
+  renderDots();
+}
+
+function skipQ(){
+  QZ.results[QZ.idx]=false;
+  QZ.wrongs.push({q:QZ.q[QZ.idx].q,ans:QZ.q[QZ.idx].ans,user:'(skipped)'});
+  nextQ();
+}
+
+function nextQ(){
+  QZ.idx++;
+  if(QZ.idx>=QZ.q.length){showScore();return;}
+  document.getElementById('btn-next').textContent='Next →';
+  showQ();
+}
+
+function showScore(){
+  document.getElementById('qz-active').style.display='none';
+  document.getElementById('qz-score').style.display='block';
+  const pct=Math.round(QZ.score/QZ.q.length*100);
+  document.getElementById('sc-big').textContent=`${QZ.score}/${QZ.q.length}`;
+  const msgs=[[100,'完璧！Perfect score! 素晴らしいです！'],[80,'とてもよくできました！Excellent work!'],[60,'よくできました。Keep it up!'],[0,'まだまだ練習が必要です。Keep studying!']];
+  document.getElementById('sc-msg').textContent=`${pct}% — `+(msgs.find(([t])=>pct>=t)||msgs[3])[1];
+  const wl=document.getElementById('sc-wrong');
+  if(QZ.wrongs.length){
+    wl.innerHTML=`<h4>Review these (${QZ.wrongs.length})</h4>`+QZ.wrongs.map(w=>`<div class="wrong-item"><div class="wq">Q: ${w.q}</div><div class="wa">✓ ${w.ans}</div></div>`).join('');
+  } else { wl.innerHTML=''; }
+}
+
+function endQuiz(){
+  document.getElementById('qz-active').style.display='none';
+  document.getElementById('qz-setup').style.display='block';
+}
+function backToSetup(){
+  document.getElementById('qz-score').style.display='none';
+  document.getElementById('qz-setup').style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// READING
+// ═══════════════════════════════════════════════════════════
+function renderReadings(){
+  document.getElementById('reading-list').innerHTML=READINGS.map(r=>`
+    <div class="reading-card">
+      <div class="rc-title">${r.title} <span class="tag tag-gold">${r.lesson}</span></div>
+      <div class="rc-text">${r.text}</div>
+      <div class="rc-q">
+        <div class="rc-q-title">読解もんだい Comprehension</div>
+        ${r.questions.map((q,i)=>`<div class="rc-q-item">${i+1}. ${q}</div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA DATA
+// ═══════════════════════════════════════════════════════════
+const KT_ALL = [
+  // vowels
+  {k:'ア',r:'a'},{k:'イ',r:'i'},{k:'ウ',r:'u'},{k:'エ',r:'e'},{k:'オ',r:'o'},
+  // k
+  {k:'カ',r:'ka'},{k:'キ',r:'ki'},{k:'ク',r:'ku'},{k:'ケ',r:'ke'},{k:'コ',r:'ko'},
+  // s
+  {k:'サ',r:'sa'},{k:'シ',r:'shi'},{k:'ス',r:'su'},{k:'セ',r:'se'},{k:'ソ',r:'so'},
+  // t
+  {k:'タ',r:'ta'},{k:'チ',r:'chi'},{k:'ツ',r:'tsu'},{k:'テ',r:'te'},{k:'ト',r:'to'},
+  // n
+  {k:'ナ',r:'na'},{k:'ニ',r:'ni'},{k:'ヌ',r:'nu'},{k:'ネ',r:'ne'},{k:'ノ',r:'no'},
+  // h
+  {k:'ハ',r:'ha'},{k:'ヒ',r:'hi'},{k:'フ',r:'fu'},{k:'ヘ',r:'he'},{k:'ホ',r:'ho'},
+  // m
+  {k:'マ',r:'ma'},{k:'ミ',r:'mi'},{k:'ム',r:'mu'},{k:'メ',r:'me'},{k:'モ',r:'mo'},
+  // y
+  {k:'ヤ',r:'ya'},{k:'ユ',r:'yu'},{k:'ヨ',r:'yo'},
+  // r
+  {k:'ラ',r:'ra'},{k:'リ',r:'ri'},{k:'ル',r:'ru'},{k:'レ',r:'re'},{k:'ロ',r:'ro'},
+  // w/n
+  {k:'ワ',r:'wa'},{k:'ヲ',r:'wo'},{k:'ン',r:'n'},
+];
+
+// Characters that are frequently confused
+const KT_TRICKY_IDS = ['シ','ツ','ソ','ン','ア','マ','ナ','メ','ス','ヌ','フ','ワ','ウ','ク'];
+const KT_TRICKY = KT_ALL.filter(c=>KT_TRICKY_IDS.includes(c.k));
+
+const KT_PAIRS = [
+  {chars:['シ','ツ'],rom:['shi','tsu'],tip:'シ strokes go RIGHT→, ツ strokes go DOWN↓'},
+  {chars:['ソ','ン'],rom:['so','n'],tip:'ソ leans left, ン leans right on its long stroke'},
+  {chars:['ア','マ'],rom:['a','ma'],tip:'ア has a diagonal drop, マ curves up at bottom right'},
+  {chars:['ナ','メ'],rom:['na','me'],tip:'ナ is a simple cross, メ has a looping X shape'},
+  {chars:['ス','ヌ'],rom:['su','nu'],tip:'ス ends with a small hook, ヌ crosses through with a loop'},
+  {chars:['フ','ワ'],rom:['fu','wa'],tip:'フ is a simple hook, ワ has a curving left leg'},
+  {chars:['ウ','ク'],rom:['u','ku'],tip:'ウ has a top bar with a drop, ク is just the right side'},
+  {chars:['ロ','ヨ'],rom:['ro','yo'],tip:'ロ is a complete box, ヨ has three right-pointing prongs'},
+];
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — STATE
+// ═══════════════════════════════════════════════════════════
+let KT = {
+  mode: 'chart',
+  // multiple choice
+  mc: { dir:'kana-rom', trickyOnly:false, pool:[], idx:0, ok:0, bad:0 },
+  // type
+  ty: { dir:'kana-rom', trickyOnly:false, pool:[], idx:0, ok:0, bad:0 },
+  // speed
+  sp: { trickyOnly:false, pool:[], idx:0, ok:0, bad:0, timer:null, timeLeft:3000 },
+};
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — MODE SWITCHING
+// ═══════════════════════════════════════════════════════════
+function ktSetMode(mode, btn) {
+  document.querySelectorAll('.kt-mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  KT.mode = mode;
+  ['chart','tricky','choice','type','speed'].forEach(m=>{
+    const p=document.getElementById('kt-panel-'+m);
+    if(p) p.style.display = m===mode?'block':'none';
+  });
+  if(mode==='chart') renderKtChart();
+  if(mode==='tricky') renderKtTricky();
+  if(mode==='choice') ktStartChoice();
+  if(mode==='type') ktStartType();
+}
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — CHART
+// ═══════════════════════════════════════════════════════════
+function renderKtChart() {
+  const g=document.getElementById('kt-chart-grid');
+  if(g.children.length) return; // already rendered
+  g.innerHTML = KT_ALL.map(c=>{
+    const isTricky = KT_TRICKY_IDS.includes(c.k);
+    return `<div class="kt-cell ${isTricky?'tricky':''}">
+      <div class="kt-char">${c.k}</div>
+      <div class="kt-rom">${c.r}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — TRICKY PAIRS
+// ═══════════════════════════════════════════════════════════
+function renderKtTricky() {
+  document.getElementById('kt-tricky-pairs').innerHTML = KT_PAIRS.map(p=>`
+    <div class="pair-card">
+      <div class="pc-chars">${p.chars.join(' · ')}</div>
+      <div class="pc-rom">${p.rom.join(' · ')}</div>
+      <div class="pc-tip">${p.tip}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — MULTIPLE CHOICE
+// ═══════════════════════════════════════════════════════════
+function ktStartChoice() {
+  const m=KT.mc;
+  m.pool = shuffle([...(m.trickyOnly?KT_TRICKY:KT_ALL)]);
+  m.idx=0; m.ok=0; m.bad=0;
+  updateKtScoreMC();
+  ktShowChoiceQ();
+}
+function ktToggleDir() {
+  const m=KT.mc; const btn=document.getElementById('kt-dir-btn');
+  m.dir = m.dir==='kana-rom'?'rom-kana':'kana-rom';
+  btn.textContent = m.dir==='kana-rom'?'ア → romaji':'romaji → ア';
+  ktStartChoice();
+}
+function ktToggleTrickyOnly() {
+  const m=KT.mc; const btn=document.getElementById('kt-tricky-only-btn');
+  m.trickyOnly = !m.trickyOnly;
+  btn.textContent = m.trickyOnly?'Tricky only':'All chars';
+  btn.className = 'kt-mode-btn'+(m.trickyOnly?' active':'');
+  ktStartChoice();
+}
+function ktShowChoiceQ() {
+  const m=KT.mc;
+  if(m.idx>=m.pool.length){ m.pool=shuffle([...(m.trickyOnly?KT_TRICKY:KT_ALL)]); m.idx=0; }
+  const cur=m.pool[m.idx];
+  document.getElementById('kt-q-ctr-mc').textContent=`#${m.idx+1}`;
+  const isKanaToRom = m.dir==='kana-rom';
+  document.getElementById('kt-lbl-mc').textContent = isKanaToRom?'What is the romanisation?':'Which katakana?';
+  const prompt = document.getElementById('kt-prompt-mc');
+  prompt.textContent = isKanaToRom?cur.k:cur.r;
+  prompt.className = 'kt-prompt'+(isKanaToRom?'':' roman');
+  // build 4 options
+  const wrong = shuffle(KT_ALL.filter(c=>c.k!==cur.k)).slice(0,3);
+  const opts = shuffle([cur,...wrong]);
+  const optEl = document.getElementById('kt-options-mc');
+  optEl.innerHTML = opts.map(o=>{
+    const label = isKanaToRom?o.r:o.k;
+    const isRomOpt = isKanaToRom;
+    return `<button class="kt-opt${isRomOpt?' roman-opt':''}" onclick="ktCheckChoice(this,'${o.r}','${cur.r}')">${label}</button>`;
+  }).join('');
+}
+function ktCheckChoice(btn, chosen, correct) {
+  const opts=document.querySelectorAll('#kt-options-mc .kt-opt');
+  opts.forEach(b=>b.classList.add('disabled'));
+  const m=KT.mc;
+  if(chosen===correct){ btn.classList.add('correct'); m.ok++; }
+  else {
+    btn.classList.add('wrong'); m.bad++;
+    // reveal correct
+    opts.forEach(b=>{ if(b.onclick.toString().includes(`'${correct}'`)) b.classList.add('correct'); });
+  }
+  updateKtScoreMC();
+  m.idx++;
+  setTimeout(()=>ktShowChoiceQ(), 900);
+}
+function updateKtScoreMC() {
+  document.getElementById('kt-ok-mc').textContent=KT.mc.ok;
+  document.getElementById('kt-bad-mc').textContent=KT.mc.bad;
+}
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — TYPE-IN
+// ═══════════════════════════════════════════════════════════
+function ktStartType() {
+  const m=KT.ty;
+  m.pool=shuffle([...(m.trickyOnly?KT_TRICKY:KT_ALL)]);
+  m.idx=0; m.ok=0; m.bad=0;
+  updateKtScoreType();
+  ktShowTypeQ();
+}
+function ktToggleDirType() {
+  const m=KT.ty; const btn=document.getElementById('kt-dir-type-btn');
+  m.dir = m.dir==='kana-rom'?'rom-kana':'kana-rom';
+  btn.textContent = m.dir==='kana-rom'?'ア → romaji':'romaji → ア';
+  ktStartType();
+}
+function ktToggleTrickyType() {
+  const m=KT.ty; const btn=document.getElementById('kt-tricky-type-btn');
+  m.trickyOnly = !m.trickyOnly;
+  btn.textContent = m.trickyOnly?'Tricky only':'All chars';
+  btn.className = 'kt-mode-btn'+(m.trickyOnly?' active':'');
+  ktStartType();
+}
+function ktShowTypeQ() {
+  const m=KT.ty;
+  if(m.idx>=m.pool.length){ m.pool=shuffle([...(m.trickyOnly?KT_TRICKY:KT_ALL)]); m.idx=0; }
+  const cur=m.pool[m.idx];
+  document.getElementById('kt-q-ctr-type').textContent=`#${m.idx+1}`;
+  const isKanaToRom = m.dir==='kana-rom';
+  document.getElementById('kt-lbl-type').textContent = isKanaToRom?'Type the romanisation:':'Type the katakana character:';
+  const prompt=document.getElementById('kt-prompt-type');
+  prompt.textContent = isKanaToRom?cur.k:cur.r;
+  prompt.className = 'kt-prompt'+(isKanaToRom?'':' roman');
+  const inp=document.getElementById('kt-inp-type');
+  inp.value=''; inp.className='kt-type-inp'; inp.disabled=false;
+  const fb=document.getElementById('kt-fb-type');
+  fb.className='kt-feedback'; fb.textContent='';
+  document.getElementById('kt-check-type').style.display='inline-block';
+  document.getElementById('kt-next-type').style.display='none';
+  setTimeout(()=>inp.focus(),30);
+}
+function ktCheckType() {
+  const m=KT.ty;
+  if(m.idx>=m.pool.length) return;
+  const cur=m.pool[m.idx];
+  const inp=document.getElementById('kt-inp-type');
+  const val=inp.value.trim().toLowerCase();
+  const correct = m.dir==='kana-rom'?cur.r:cur.k;
+  // accept alternate romanisations
+  const alts={shi:['si'],chi:['ti'],tsu:['tu'],fu:['hu'],ji:['zi'],zu:['du']};
+  const isOk = val===correct || Object.entries(alts).some(([std,alt])=>std===correct&&alt.includes(val));
+  inp.className='kt-type-inp '+(isOk?'ok':'bad'); inp.disabled=true;
+  const fb=document.getElementById('kt-fb-type');
+  fb.className='kt-feedback show '+(isOk?'ok':'bad');
+  fb.textContent=isOk?'✓ せいかい！':'✗ こたえ: '+correct;
+  if(isOk) m.ok++; else m.bad++;
+  updateKtScoreType();
+  m.idx++;
+  document.getElementById('kt-check-type').style.display='none';
+  document.getElementById('kt-next-type').style.display='inline-block';
+}
+function ktNextType() { ktShowTypeQ(); }
+function updateKtScoreType() {
+  document.getElementById('kt-ok-type').textContent=KT.ty.ok;
+  document.getElementById('kt-bad-type').textContent=KT.ty.bad;
+}
+
+// ═══════════════════════════════════════════════════════════
+// KATAKANA — SPEED DRILL
+// ═══════════════════════════════════════════════════════════
+let spTrickyOnly=false;
+function ktSpToggle(mode, el) {
+  document.querySelectorAll('[id^="sp-"][id$="-pill"]').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  spTrickyOnly = mode==='tricky';
+}
+function ktStartSpeed() {
+  const m=KT.sp;
+  m.pool=shuffle([...(spTrickyOnly?KT_TRICKY:KT_ALL)]);
+  m.idx=0; m.ok=0; m.bad=0;
+  document.getElementById('kt-speed-setup').style.display='none';
+  document.getElementById('kt-speed-score').style.display='none';
+  document.getElementById('kt-speed-active').style.display='block';
+  ktNextSpeed();
+}
+function ktShowSpeedQ() {
+  const m=KT.sp;
+  const cur=m.pool[m.idx];
+  document.getElementById('kt-q-ctr-sp').textContent=`${m.idx+1}/${m.pool.length}`;
+  document.getElementById('kt-prompt-sp').textContent=cur.k;
+  const inp=document.getElementById('kt-inp-sp');
+  inp.value=''; inp.className='kt-type-inp'; inp.disabled=false;
+  const fb=document.getElementById('kt-fb-sp');
+  fb.className='kt-feedback'; fb.textContent='';
+  document.getElementById('kt-check-sp').style.display='inline-block';
+  document.getElementById('kt-next-sp').style.display='none';
+  document.getElementById('kt-ok-sp').textContent=m.ok;
+  document.getElementById('kt-bad-sp').textContent=m.bad;
+  setTimeout(()=>inp.focus(),30);
+  // start timer
+  clearInterval(m.timer);
+  m.timeLeft=3000;
+  ktUpdateTimerBar(100);
+  m.timer=setInterval(()=>{
+    m.timeLeft-=100;
+    ktUpdateTimerBar(m.timeLeft/3000*100);
+    if(m.timeLeft<=0){
+      clearInterval(m.timer);
+      // time up = wrong
+      m.bad++;
+      document.getElementById('kt-ok-sp').textContent=m.ok;
+      document.getElementById('kt-bad-sp').textContent=m.bad;
+      const fb=document.getElementById('kt-fb-sp');
+      fb.className='kt-feedback show bad';
+      fb.textContent='⏱ Too slow! こたえ: '+cur.r;
+      inp.disabled=true;
+      document.getElementById('kt-check-sp').style.display='none';
+      document.getElementById('kt-next-sp').style.display='inline-block';
+      m.idx++;
+      if(m.idx>=m.pool.length) document.getElementById('kt-next-sp').textContent='Results →';
+    }
+  },100);
+}
+function ktUpdateTimerBar(pct) {
+  const fill=document.getElementById('kt-timer-fill');
+  fill.style.width=Math.max(0,pct)+'%';
+  fill.style.background = pct>60?'var(--gold)':pct>25?'#e07800':'var(--red)';
+}
+function ktCheckSpeed() {
+  const m=KT.sp;
+  clearInterval(m.timer);
+  if(m.idx>=m.pool.length) return;
+  const cur=m.pool[m.idx];
+  const val=document.getElementById('kt-inp-sp').value.trim().toLowerCase();
+  const alts={shi:['si'],chi:['ti'],tsu:['tu'],fu:['hu']};
+  const isOk = val===cur.r || Object.entries(alts).some(([std,alt])=>std===cur.r&&alt.includes(val));
+  const inp=document.getElementById('kt-inp-sp');
+  inp.className='kt-type-inp '+(isOk?'ok':'bad'); inp.disabled=true;
+  const fb=document.getElementById('kt-fb-sp');
+  fb.className='kt-feedback show '+(isOk?'ok':'bad');
+  fb.textContent=isOk?'✓ せいかい！':'✗ こたえ: '+cur.r;
+  if(isOk) m.ok++; else m.bad++;
+  document.getElementById('kt-ok-sp').textContent=m.ok;
+  document.getElementById('kt-bad-sp').textContent=m.bad;
+  m.idx++;
+  document.getElementById('kt-check-sp').style.display='none';
+  document.getElementById('kt-next-sp').style.display='inline-block';
+  if(m.idx>=m.pool.length) document.getElementById('kt-next-sp').textContent='Results →';
+  ktUpdateTimerBar(0);
+}
+function ktNextSpeed() {
+  const m=KT.sp;
+  if(m.idx>=m.pool.length){ ktShowSpeedScore(); return; }
+  ktShowSpeedQ();
+}
+function ktShowSpeedScore() {
+  clearInterval(KT.sp.timer);
+  document.getElementById('kt-speed-active').style.display='none';
+  document.getElementById('kt-speed-score').style.display='block';
+  const m=KT.sp;
+  const pct=Math.round(m.ok/(m.ok+m.bad)*100)||0;
+  document.getElementById('sp-big').textContent=`${m.ok}/${m.ok+m.bad}`;
+  const msgs=[[100,'完璧！Lightning fast!'],[80,'すごい！Great speed!'],[60,'まあまあ。Keep practising!'],[0,'がんばって！Speed will come with practice.']];
+  document.getElementById('sp-msg').textContent=`${pct}% — `+(msgs.find(([t])=>pct>=t)||msgs[3])[1];
+}
+function ktEndSpeed() {
+  clearInterval(KT.sp.timer);
+  document.getElementById('kt-speed-active').style.display='none';
+  document.getElementById('kt-speed-score').style.display='none';
+  document.getElementById('kt-speed-setup').style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTIL
+// ═══════════════════════════════════════════════════════════
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr; }
+
+
+
+// ═══════════════════════════════════════════════════════════
+// INIT — auth flow handles renderDashboard after sign-in
+// ═══════════════════════════════════════════════════════════
+// renderDashboard() is called by onSignedIn() above
+</script>
+</body>
+</html>
