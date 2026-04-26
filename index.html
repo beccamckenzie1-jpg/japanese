@@ -301,7 +301,54 @@ details[open] summary { color: var(--red); }
 .rc-q-item { font-family: 'Noto Sans JP', sans-serif; font-size: .88rem; margin-bottom: 5px; }
 
 /* ──────────────────────────────────────────
-   KATAKANA DRILL
+   CONVERSATION PAGE
+──────────────────────────────────────────*/
+.cv-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.cv-tab {
+  padding:9px 18px; border-radius:6px; border:1.5px solid var(--border);
+  background:white; font-family:'DM Mono',monospace; font-size:.75rem;
+  letter-spacing:.07em; text-transform:uppercase; cursor:pointer;
+  transition:all .14s; color:var(--grey);
+}
+.cv-tab:hover { border-color:var(--ink); color:var(--ink); }
+.cv-tab.active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+.cv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:11px; }
+.cv-card {
+  background:white; border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; box-shadow:var(--shadow); position:relative;
+}
+.cv-card .cv-word { font-family:'Noto Sans JP',sans-serif; font-size:1.1rem; font-weight:500; margin-bottom:2px; }
+.cv-card .cv-reading { font-size:.72rem; color:var(--grey); margin-bottom:5px; }
+.cv-card .cv-meaning { font-size:.82rem; color:var(--blue); font-style:italic; margin-bottom:8px; }
+.cv-card .cv-example { font-family:'Noto Sans JP',sans-serif; font-size:.82rem; color:var(--ink); margin-bottom:2px; }
+.cv-card .cv-trans { font-size:.74rem; color:var(--grey); font-style:italic; }
+.cv-card .cv-type-badge {
+  position:absolute; top:10px; right:12px;
+  font-size:.58rem; text-transform:uppercase; letter-spacing:.09em;
+}
+.cv-card.nuance { border-left:3px solid var(--gold); }
+.cv-card.contrast { border-left:3px solid var(--red); }
+.cv-card.addition { border-left:3px solid var(--green); }
+.cv-card.result { border-left:3px solid var(--blue); }
+.cv-card.timing { border-left:3px solid var(--purple); }
+
+.cv-patterns-list { display:flex; flex-direction:column; gap:14px; }
+.cv-pattern-card {
+  background:white; border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:20px 22px; box-shadow:var(--shadow);
+}
+.cv-pattern-card .cpp-situation {
+  font-size:.65rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--grey); margin-bottom:8px; font-family:'DM Mono',monospace;
+}
+.cv-pattern-card .cpp-pattern {
+  font-family:'Shippori Mincho',serif; font-size:1.1rem; color:var(--red); margin-bottom:6px;
+}
+.cv-pattern-card .cpp-note { font-size:.78rem; color:var(--grey); margin-bottom:10px; }
+.cv-pattern-card .cpp-examples { display:flex; flex-direction:column; gap:6px; }
+.cv-pattern-card .cpp-ex .jp { font-family:'Noto Sans JP',sans-serif; font-size:.87rem; }
+.cv-pattern-card .cpp-ex .en { font-size:.75rem; color:var(--grey); font-style:italic; }
 ──────────────────────────────────────────*/
 .kt-mode-bar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
 .kt-mode-btn {
@@ -460,6 +507,7 @@ details[open] summary { color: var(--red); }
   <button class="tab" onclick="showPage('kanji',this)">漢 Kanji</button>
   <button class="tab" onclick="showPage('quiz',this)">✏️ Quiz</button>
   <button class="tab" onclick="showPage('reading',this)">📄 Reading</button>
+  <button class="tab" onclick="showPage('conversation',this)">💬 Conversation</button>
   <button class="tab" onclick="showPage('katakana',this)">ア Katakana</button>
 </nav>
 
@@ -617,6 +665,43 @@ details[open] summary { color: var(--red); }
   <div class="page-title">読解 <em>Reading</em></div>
   <div class="page-desc">Short passages from your lesson materials with comprehension questions.</div>
   <div id="reading-list"></div>
+</div>
+
+<!-- ══ CONVERSATION ══ -->
+<div id="page-conversation" class="page">
+  <div class="page-title">会話 <em>Conversation Tools</em></div>
+  <div class="page-desc">Connector words, timing expressions, useful phrases and conversation building blocks.</div>
+
+  <div class="cv-tabs">
+    <button class="cv-tab active" onclick="cvSection('connectors',this)">🔗 Connectors</button>
+    <button class="cv-tab" onclick="cvSection('timing',this)">⏱ Timing words</button>
+    <button class="cv-tab" onclick="cvSection('fillers',this)">💭 Useful phrases</button>
+    <button class="cv-tab" onclick="cvSection('patterns',this)">🗣 Sentence patterns</button>
+  </div>
+
+  <div id="cv-connectors" class="cv-section">
+    <h2 class="section-h">接続詞 Connectors & Conjunctions</h2>
+    <div class="page-desc">Words that link sentences and ideas together.</div>
+    <div class="cv-grid" id="cv-connectors-grid"></div>
+  </div>
+
+  <div id="cv-timing" class="cv-section" style="display:none">
+    <h2 class="section-h">時間の表現 Timing & Time Expressions</h2>
+    <div class="page-desc">When things happen — just, yet, already, soon, still, eventually…</div>
+    <div class="cv-grid" id="cv-timing-grid"></div>
+  </div>
+
+  <div id="cv-fillers" class="cv-section" style="display:none">
+    <h2 class="section-h">便利な表現 Useful Phrases & Fillers</h2>
+    <div class="page-desc">Conversation fillers, softeners, reactions and natural-sounding expressions.</div>
+    <div class="cv-grid" id="cv-fillers-grid"></div>
+  </div>
+
+  <div id="cv-patterns" class="cv-section" style="display:none">
+    <h2 class="section-h">会話パターン Conversation Sentence Patterns</h2>
+    <div class="page-desc">Ready-made structures for common conversational situations.</div>
+    <div class="cv-patterns-list" id="cv-patterns-list"></div>
+  </div>
 </div>
 
 <!-- ══ KATAKANA ══ -->
@@ -2003,9 +2088,10 @@ function showPage(id, el) {
   if (id==='grammar')  renderGrammar();
   if (id==='kanji')    renderKanji();
   if (id==='quiz')     initQuizSetup();
-  if (id==='reading')   renderReadings();
-  if (id==='dashboard') renderDashboard();
-  if (id==='katakana')  renderKtChart();
+  if (id==='reading')      renderReadings();
+  if (id==='dashboard')    renderDashboard();
+  if (id==='katakana')     renderKtChart();
+  if (id==='conversation') renderConversation();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2807,8 +2893,233 @@ function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.r
 
 
 // ═══════════════════════════════════════════════════════════
-// INIT — auth flow handles renderDashboard after sign-in
+// CONVERSATION DATA
 // ═══════════════════════════════════════════════════════════
+const CV_CONNECTORS = [
+  // Addition
+  { word:"そして", reading:"", meaning:"and (then) / and also", type:"addition", typeLabel:"addition",
+    examples:[{jp:"ごはんをたべました。そしてコーヒーをのみました。",en:"I ate a meal. And then I drank coffee."},{jp:"かれはやさしいです。そしてかっこいいです。",en:"He is kind. And also handsome."}] },
+  { word:"それから", reading:"", meaning:"and then / after that", type:"addition", typeLabel:"addition",
+    examples:[{jp:"えきをでました。それからバスにのりました。",en:"I left the station. After that I got on a bus."},{jp:"シャワーをあびました。それからごはんをつくりました。",en:"I showered. Then I made dinner."}] },
+  { word:"それに", reading:"", meaning:"moreover / on top of that / besides", type:"addition", typeLabel:"addition",
+    examples:[{jp:"このレストランはおいしいです。それに、やすいです。",en:"This restaurant is delicious. On top of that, it's cheap."},{jp:"かれはせがたかいです。それに、かおもいいです。",en:"He is tall. Moreover, he has a nice face."}] },
+  { word:"そのうえ", reading:"", meaning:"furthermore / what's more", type:"addition", typeLabel:"addition",
+    examples:[{jp:"かれはにほんごがじょうずです。そのうえ、ちゅうごくごもはなせます。",en:"He is good at Japanese. Furthermore, he can also speak Chinese."}] },
+  { word:"また", reading:"", meaning:"also / in addition / again", type:"addition", typeLabel:"addition",
+    examples:[{jp:"にほんごをべんきょうしています。また、かんじもれんしゅうしています。",en:"I am studying Japanese. I am also practising kanji."},{jp:"またきてください。",en:"Please come again."}] },
+  // Contrast
+  { word:"でも", reading:"", meaning:"but / however / even so", type:"contrast", typeLabel:"contrast",
+    examples:[{jp:"にほんごはすきです。でも、むずかしいです。",en:"I like Japanese. But it's difficult."},{jp:"いきたいです。でも、じかんがありません。",en:"I want to go. But I don't have time."}] },
+  { word:"しかし", reading:"", meaning:"however / but (formal/written)", type:"contrast", typeLabel:"contrast",
+    examples:[{jp:"にほんのふゆはさむいです。しかし、ゆきはきれいです。",en:"Japanese winters are cold. However, the snow is beautiful."},{jp:"けんきゅうした。しかし、こたえがみつからなかった。",en:"I researched it. However, I couldn't find the answer."}] },
+  { word:"ところが", reading:"", meaning:"however / but (unexpected result)", type:"contrast", typeLabel:"contrast",
+    examples:[{jp:"かれはかならずくると言っていた。ところが、こなかった。",en:"He said he would definitely come. However, he didn't."},{jp:"かんたんだとおもった。ところが、むずかしかった。",en:"I thought it would be easy. However, it was difficult."}] },
+  { word:"けれども／けれど／けど", reading:"", meaning:"but / although / however (softer than しかし)", type:"contrast", typeLabel:"contrast",
+    examples:[{jp:"たかいけど、かいたいです。",en:"It's expensive, but I want to buy it."},{jp:"いきたかったけれど、びょうきでした。",en:"I wanted to go, but I was ill."}] },
+  { word:"それでも", reading:"", meaning:"even so / nevertheless / still", type:"contrast", typeLabel:"contrast",
+    examples:[{jp:"あめがふっていました。それでも、でかけました。",en:"It was raining. Even so, I went out."},{jp:"たいへんでした。それでも、あきらめませんでした。",en:"It was tough. Nevertheless, I didn't give up."}] },
+  // Result / reason
+  { word:"だから", reading:"", meaning:"so / therefore / that's why", type:"result", typeLabel:"result",
+    examples:[{jp:"あめがふっています。だから、かさをもっていきます。",en:"It's raining. So I'll take an umbrella."},{jp:"つかれました。だから、はやくねます。",en:"I'm tired. That's why I'm going to bed early."}] },
+  { word:"そのため", reading:"", meaning:"for that reason / therefore (formal)", type:"result", typeLabel:"result",
+    examples:[{jp:"じしんがありました。そのため、でんしゃがとまりました。",en:"There was an earthquake. For that reason, the trains stopped."},{jp:"ねつがあります。そのため、かいしゃをやすみます。",en:"I have a fever. Therefore I will take the day off."}] },
+  { word:"したがって", reading:"", meaning:"consequently / accordingly (formal/written)", type:"result", typeLabel:"result",
+    examples:[{jp:"ほうりつがかわりました。したがって、てつづきもかわります。",en:"The law has changed. Consequently, the procedures will also change."}] },
+  // Nuance / concession
+  { word:"ところで", reading:"", meaning:"by the way / incidentally", type:"nuance", typeLabel:"nuance",
+    examples:[{jp:"ところで、しゅうまつはなにをしますか。",en:"By the way, what are you doing at the weekend?"},{jp:"ところで、たなかさんはげんきですか。",en:"By the way, is Tanaka-san well?"}] },
+  { word:"それでは／じゃあ", reading:"", meaning:"well then / in that case / right then", type:"nuance", typeLabel:"nuance",
+    examples:[{jp:"それでは、はじめましょう。",en:"Well then, let's begin."},{jp:"じゃあ、またあとで。",en:"Right then, see you later."}] },
+  { word:"たとえば", reading:"", meaning:"for example", type:"nuance", typeLabel:"nuance",
+    examples:[{jp:"くだものがすきです。たとえば、りんごやもも。",en:"I like fruit. For example, apples and peaches."},{jp:"いろいろなくにへいきたいです。たとえば、にほんやフランス。",en:"I want to go to various countries. For example, Japan and France."}] },
+  { word:"つまり", reading:"", meaning:"in other words / that is to say", type:"nuance", typeLabel:"nuance",
+    examples:[{jp:"かれはわたしのちちのあにです。つまり、おじさんです。",en:"He is my father's older brother. In other words, my uncle."},{jp:"つまり、どういうことですか。",en:"In other words, what does that mean?"}] },
+];
+
+const CV_TIMING = [
+  { word:"もう", reading:"", meaning:"already / now (with affirmative)", type:"timing", typeLabel:"timing",
+    examples:[{jp:"もうたべました。",en:"I've already eaten."},{jp:"もうじゅうじです。",en:"It's already 10 o'clock."}] },
+  { word:"まだ", reading:"", meaning:"still / not yet (with negative)", type:"timing", typeLabel:"timing",
+    examples:[{jp:"まだたべていません。",en:"I haven't eaten yet."},{jp:"かれはまだねています。",en:"He is still sleeping."}] },
+  { word:"やっと", reading:"", meaning:"finally / at last (after a long wait)", type:"timing", typeLabel:"timing",
+    examples:[{jp:"やっとわかりました。",en:"I finally understood."},{jp:"やっとはるになりました。",en:"Spring has finally arrived."}] },
+  { word:"ついに", reading:"", meaning:"finally / at last (after effort/anticipation)", type:"timing", typeLabel:"timing",
+    examples:[{jp:"ついにNJLPTにごうかくしました！",en:"I finally passed the JLPT!"},{jp:"ついにかれはあやまりました。",en:"He finally apologised."}] },
+  { word:"もうすぐ", reading:"", meaning:"very soon / any moment now", type:"timing", typeLabel:"timing",
+    examples:[{jp:"もうすぐはるです。",en:"Spring is coming very soon."},{jp:"もうすぐつくはずです。",en:"They should arrive any moment."}] },
+  { word:"さっき", reading:"", meaning:"a little while ago / just now", type:"timing", typeLabel:"timing",
+    examples:[{jp:"さっきでんわしました。",en:"I called a little while ago."},{jp:"さっきたべたばかりです。",en:"I just ate a short while ago."}] },
+  { word:"たった今", reading:"たったいま", meaning:"just now / this very moment", type:"timing", typeLabel:"timing",
+    examples:[{jp:"たった今ついたところです。",en:"I just arrived this very moment."},{jp:"たった今おわったところです。",en:"I just finished this very moment."}] },
+  { word:"ちょうど", reading:"", meaning:"just / exactly / right (at that moment)", type:"timing", typeLabel:"timing",
+    examples:[{jp:"ちょうどいまから、はじまるところです。",en:"It's just about to start right now."},{jp:"ちょうどいいです。",en:"That's just right / perfect."}] },
+  { word:"まず", reading:"", meaning:"first of all / to start with", type:"timing", typeLabel:"timing",
+    examples:[{jp:"まず、てをあらってください。",en:"First of all, please wash your hands."},{jp:"まず、じこしょうかいをします。",en:"To start with, I'll introduce myself."}] },
+  { word:"つぎに", reading:"次に", meaning:"next / then (in sequence)", type:"timing", typeLabel:"timing",
+    examples:[{jp:"まずAをやってください。つぎにBをやってください。",en:"First, please do A. Next, please do B."}] },
+  { word:"さいごに", reading:"最後に", meaning:"finally / lastly / at the end", type:"timing", typeLabel:"timing",
+    examples:[{jp:"さいごに、しつもんがあればどうぞ。",en:"Finally, if you have any questions, please go ahead."},{jp:"さいごにデザートをたべました。",en:"At the end I ate dessert."}] },
+  { word:"すぐに", reading:"", meaning:"immediately / right away", type:"timing", typeLabel:"timing",
+    examples:[{jp:"すぐにいきます。",en:"I'll go right away."},{jp:"すぐにへんじをください。",en:"Please reply immediately."}] },
+  { word:"そのうち", reading:"", meaning:"before long / eventually / someday", type:"timing", typeLabel:"timing",
+    examples:[{jp:"そのうちわかるようになりますよ。",en:"You'll come to understand before long."},{jp:"そのうちあいにいきます。",en:"I'll come to visit you eventually."}] },
+  { word:"いつの間にか", reading:"いつのまにか", meaning:"before I knew it / without noticing", type:"timing", typeLabel:"timing",
+    examples:[{jp:"いつのまにかそとがくらくなっていました。",en:"Before I knew it, it had gotten dark outside."}] },
+  { word:"〜てから", reading:"", meaning:"after doing ~ / once ~ is done", type:"timing", typeLabel:"timing",
+    examples:[{jp:"しゅくだいをしてから、あそびます。",en:"After doing homework, I'll play."},{jp:"けっこんしてから、にほんへひっこしました。",en:"After getting married, I moved to Japan."}] },
+  { word:"〜前に", reading:"〜まえに", meaning:"before doing ~", type:"timing", typeLabel:"timing",
+    examples:[{jp:"ねるまえに、はをみがきます。",en:"Before sleeping, I brush my teeth."},{jp:"かいぎのまえに、しりょうをよんでください。",en:"Before the meeting, please read the materials."}] },
+];
+
+const CV_FILLERS = [
+  // Conversation openers / reactions
+  { word:"あのう…", reading:"", meaning:"um… / er… (hesitation filler)", type:"nuance", typeLabel:"filler",
+    examples:[{jp:"あのう、すみませんが…",en:"Um, excuse me, but…"},{jp:"あのう、ちょっといいですか。",en:"Er, is it OK for a moment?"}] },
+  { word:"えーと…", reading:"", meaning:"um… / let me think… (thinking filler)", type:"nuance", typeLabel:"filler",
+    examples:[{jp:"えーと、なんでしたっけ。",en:"Um, what was it again?"},{jp:"えーと、そうですね…",en:"Hmm, let me think…"}] },
+  { word:"そうですね", reading:"", meaning:"let me see… / that's right / yes indeed", type:"nuance", typeLabel:"filler",
+    examples:[{jp:"そうですね、むずかしいですね。",en:"That's right, it is difficult."},{jp:"そうですね…ちょっとかんがえさせてください。",en:"Let me see… please let me think a bit."}] },
+  { word:"なるほど", reading:"", meaning:"I see / I understand now / that makes sense", type:"nuance", typeLabel:"filler",
+    examples:[{jp:"なるほど、そういうことですか。",en:"I see, so that's what it means."},{jp:"なるほど！わかりました。",en:"Ah, I see! I understand now."}] },
+  { word:"そうか／そっか", reading:"", meaning:"oh I see / oh right (casual realisation)", type:"nuance", typeLabel:"filler",
+    examples:[{jp:"そっか、それは知らなかった。",en:"Oh right, I didn't know that."},{jp:"そうか、だからか。",en:"I see, so that's why."}] },
+  { word:"本当ですか", reading:"ほんとうですか", meaning:"really? / is that so?", type:"nuance", typeLabel:"filler",
+    examples:[{jp:"ほんとうですか！すごい！",en:"Really?! Amazing!"},{jp:"ほんとうですか、しりませんでした。",en:"Is that so? I didn't know."}] },
+  { word:"ちょっと待ってください", reading:"", meaning:"please wait a moment", type:"nuance", typeLabel:"phrase",
+    examples:[{jp:"ちょっとまってください、かくにんします。",en:"Please wait a moment, I'll check."},{jp:"ちょっとまって、いまいそがしい。",en:"Wait a sec, I'm busy right now."}] },
+  { word:"どういう意味ですか", reading:"どういういみですか", meaning:"what does that mean?", type:"nuance", typeLabel:"phrase",
+    examples:[{jp:"すみません、どういういみですか。",en:"Excuse me, what does that mean?"},{jp:"この漢字はどういういみですか。",en:"What does this kanji mean?"}] },
+  { word:"もう一度言ってください", reading:"もういちどいってください", meaning:"please say that again", type:"nuance", typeLabel:"phrase",
+    examples:[{jp:"すみません、もういちどいってください。",en:"Excuse me, please say that again."},{jp:"もうすこしゆっくりいってください。",en:"Please speak a little more slowly."}] },
+  { word:"〜んですが…", reading:"", meaning:"the thing is… / it's that… (explaining a situation)", type:"nuance", typeLabel:"pattern",
+    examples:[{jp:"ちょっとそうだんがあるんですが…",en:"It's that I have something I'd like to consult about…"},{jp:"じつは、でんしゃにのりおくれたんですが。",en:"The thing is, I missed the train."}] },
+  { word:"〜かもしれません", reading:"", meaning:"it might be ~ / perhaps", type:"nuance", typeLabel:"pattern",
+    examples:[{jp:"おそくなるかもしれません。",en:"I might be late."},{jp:"かれはしらないかもしれません。",en:"He might not know."}] },
+  { word:"よかったら", reading:"", meaning:"if you like / if it's OK with you", type:"nuance", typeLabel:"phrase",
+    examples:[{jp:"よかったら、いっしょにいきませんか。",en:"If you like, shall we go together?"},{jp:"よかったら、これつかってください。",en:"If it's OK with you, please use this."}] },
+  { word:"せっかく〜のに", reading:"", meaning:"it's a shame that… / going to all that trouble", type:"nuance", typeLabel:"pattern",
+    examples:[{jp:"せっかくつくったのに、たべてもらえなかった。",en:"I went to all the trouble of making it, but no one ate it."},{jp:"せっかくにほんにきたのに、ふじさんにのぼれなかった。",en:"I came all the way to Japan and couldn't climb Mt Fuji."}] },
+  { word:"〜てしまいました", reading:"", meaning:"I ended up doing ~ / (accidentally/regrettably) did ~", type:"nuance", typeLabel:"pattern",
+    examples:[{jp:"さいふをわすれてしまいました。",en:"I (accidentally) left my wallet behind."},{jp:"たべすぎてしまいました。",en:"I ended up eating too much."}] },
+];
+
+const CV_PATTERNS = [
+  { situation:"Giving a reason politely",
+    pattern:"〜んです／〜んですが",
+    note:"Adds nuance, explanation or softness. More natural than plain statement.",
+    examples:[
+      {jp:"じつは、きょうはじかんがないんです。",en:"The truth is, I don't have time today."},
+      {jp:"すみません、ちょっとぐあいがわるいんですが…",en:"I'm sorry, the thing is I'm not feeling well…"},
+    ]},
+  { situation:"Asking for permission politely",
+    pattern:"〜てもいいですか",
+    note:"Standard polite request for permission.",
+    examples:[
+      {jp:"ここにすわってもいいですか。",en:"May I sit here?"},
+      {jp:"しゃしんをとってもいいですか。",en:"May I take a photo?"},
+    ]},
+  { situation:"Making a suggestion",
+    pattern:"〜ませんか／〜ましょうか",
+    note:"ませんか = invitation (shall we?). ましょうか = offering to do something.",
+    examples:[
+      {jp:"いっしょにたべませんか。",en:"Shall we eat together?"},
+      {jp:"もちましょうか。",en:"Shall I carry that?"},
+    ]},
+  { situation:"Expressing a wish / desire",
+    pattern:"〜たいんですが / 〜ほしいんですが",
+    note:"Add んですが to soften — sounds more natural and less blunt.",
+    examples:[
+      {jp:"よやくをしたいんですが。",en:"I'd like to make a reservation."},
+      {jp:"もうすこしやすくしてほしいんですが。",en:"I'd like it to be a little cheaper if possible."},
+    ]},
+  { situation:"Expressing contrast / disappointment",
+    pattern:"〜のに",
+    note:"Even though / despite. Implies something unexpected or unfair.",
+    examples:[
+      {jp:"べんきょうしたのに、しけんにおちました。",en:"Even though I studied, I failed the exam."},
+      {jp:"たかいのに、おいしくなかった。",en:"Despite being expensive, it wasn't tasty."},
+    ]},
+  { situation:"Explaining a recent action",
+    pattern:"〜たばかりです",
+    note:"Just did something very recently.",
+    examples:[
+      {jp:"さっきたべたばかりなので、おなかがいっぱいです。",en:"I just ate a little while ago so I'm full."},
+      {jp:"にほんにきたばかりなので、まだなれていません。",en:"I just came to Japan so I'm not used to it yet."},
+    ]},
+  { situation:"Describing ongoing / just completed action",
+    pattern:"〜ているところです／〜たところです",
+    note:"ているところ = right in the middle of. たところ = just this moment finished.",
+    examples:[
+      {jp:"いまかくにんしているところです。",en:"I'm right in the middle of checking it now."},
+      {jp:"たった今ついたところです。",en:"I just arrived this very moment."},
+    ]},
+  { situation:"Expressing logical expectation",
+    pattern:"〜はずです",
+    note:"Should be / I expect that. Based on reasoning, not guessing.",
+    examples:[
+      {jp:"かれはもうきているはずです。",en:"He should already be here."},
+      {jp:"このみせはやすいはずです。",en:"This shop should be cheap."},
+    ]},
+  { situation:"Asking what something is like",
+    pattern:"〜はどうですか／いかがですか",
+    note:"いかがですか is more polite.",
+    examples:[
+      {jp:"にほんのせいかつはどうですか。",en:"How is life in Japan?"},
+      {jp:"おちゃはいかがですか。",en:"Would you like some tea?"},
+    ]},
+  { situation:"Softening a refusal or difficulty",
+    pattern:"ちょっと〜んですが…",
+    note:"ちょっと softens; the trailing んですが leaves it open-ended and polite.",
+    examples:[
+      {jp:"ちょっとむずかしいんですが…",en:"It's a little difficult (for me)…"},
+      {jp:"ちょっといそがしいんですが…",en:"I'm a little busy right now…"},
+    ]},
+];
+
+let cvRendered = false;
+function renderConversation() {
+  if (cvRendered) return;
+  cvRendered = true;
+  renderCvGrid('cv-connectors-grid', CV_CONNECTORS);
+  renderCvGrid('cv-timing-grid', CV_TIMING);
+  renderCvGrid('cv-fillers-grid', CV_FILLERS);
+  renderCvPatterns();
+}
+
+function renderCvGrid(elId, data) {
+  document.getElementById(elId).innerHTML = data.map(item => {
+    const colorClass = {addition:'addition',contrast:'contrast',result:'result',nuance:'nuance',timing:'timing'}[item.type]||'';
+    const badge = `<span class="tag tag-${
+      item.type==='addition'?'green':item.type==='contrast'?'red':item.type==='result'?'blue':item.type==='timing'?'purple':'gold'
+    }">${item.typeLabel}</span>`;
+    return `<div class="cv-card ${colorClass}">
+      <div class="cv-type-badge">${badge}</div>
+      <div class="cv-word">${item.word}</div>
+      ${item.reading?`<div class="cv-reading">${item.reading}</div>`:''}
+      <div class="cv-meaning">${item.meaning}</div>
+      ${item.examples.map(e=>`<div class="cv-example">・${e.jp}</div><div class="cv-trans">${e.en}</div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderCvPatterns() {
+  document.getElementById('cv-patterns-list').innerHTML = CV_PATTERNS.map(p => `
+    <div class="cv-pattern-card">
+      <div class="cpp-situation">${p.situation}</div>
+      <div class="cpp-pattern">${p.pattern}</div>
+      <div class="cpp-note">${p.note}</div>
+      <div class="cpp-examples">
+        ${p.examples.map(e=>`<div class="cpp-ex"><div class="jp">・${e.jp}</div><div class="en">${e.en}</div></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function cvSection(id, btn) {
+  document.querySelectorAll('.cv-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.cv-section').forEach(s=>s.style.display='none');
+  document.getElementById('cv-'+id).style.display='block';
+}
 // renderDashboard() is called by onSignedIn() above
 </script>
 </body>
