@@ -349,8 +349,67 @@ details[open] summary { color: var(--red); }
 .cv-pattern-card .cpp-examples { display:flex; flex-direction:column; gap:6px; }
 .cv-pattern-card .cpp-ex .jp { font-family:'Noto Sans JP',sans-serif; font-size:.87rem; }
 .cv-pattern-card .cpp-ex .en { font-size:.75rem; color:var(--grey); font-style:italic; }
+
+/* ──────────────────────────────────────────
+   EXAM PRACTICE
 ──────────────────────────────────────────*/
-.kt-mode-bar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+.exam-setup-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; margin-bottom:20px; }
+.exam-section-card {
+  background:white; border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:22px; box-shadow:var(--shadow); cursor:pointer;
+  transition:transform .14s, box-shadow .14s;
+}
+.exam-section-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+.exam-section-card .esc-icon { font-size:1.8rem; margin-bottom:8px; }
+.exam-section-card .esc-title { font-family:'Shippori Mincho',serif; font-size:1.05rem; margin-bottom:4px; }
+.exam-section-card .esc-desc { font-size:.74rem; color:var(--grey); margin-bottom:10px; line-height:1.5; }
+.exam-section-card .esc-meta { display:flex; gap:6px; flex-wrap:wrap; }
+.exam-wrap { max-width:620px; }
+.exam-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.exam-section-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--grey); margin-bottom:3px; }
+.exam-progress-text { font-size:.8rem; color:var(--ink); }
+.exam-dots { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:18px; }
+.exam-dots .dot { width:9px; height:9px; border-radius:50%; background:var(--border); }
+.exam-dots .dot.ok { background:var(--green); }
+.exam-dots .dot.bad { background:var(--red); }
+.exam-dots .dot.cur { background:var(--gold); }
+.exam-q-card {
+  background:white; border:1.5px solid var(--border); border-radius:12px;
+  padding:24px 26px; box-shadow:var(--shadow-lg); margin-bottom:16px;
+}
+.exam-q-card .eq-type { font-size:.62rem; text-transform:uppercase; letter-spacing:.12em; color:var(--grey); margin-bottom:10px; font-family:'DM Mono',monospace; }
+.exam-q-card .eq-instruction { font-size:.8rem; color:var(--grey); margin-bottom:12px; font-style:italic; }
+.exam-q-card .eq-question { font-family:'Noto Sans JP',sans-serif; font-size:1.05rem; line-height:1.9; margin-bottom:8px; }
+.exam-q-card .eq-passage {
+  font-family:'Noto Serif JP',serif; font-size:.92rem; line-height:2.2;
+  background:var(--paper2); border-radius:8px; padding:14px 16px;
+  margin-bottom:14px; border-left:3px solid var(--border);
+}
+.exam-options { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:12px; }
+.exam-opt {
+  background:white; border:2px solid var(--border); border-radius:9px;
+  padding:13px 14px; cursor:pointer; transition:all .12s;
+  font-family:'Noto Sans JP',sans-serif; font-size:.92rem; text-align:left;
+  display:flex; align-items:center; gap:8px;
+}
+.exam-opt .opt-num {
+  width:22px; height:22px; border-radius:50%; border:1.5px solid var(--border);
+  font-size:.68rem; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; font-family:'DM Mono',monospace; color:var(--grey);
+}
+.exam-opt:hover { border-color:var(--gold); background:var(--gold-light); }
+.exam-opt.correct { border-color:var(--green)!important; background:var(--green-light)!important; }
+.exam-opt.correct .opt-num { border-color:var(--green); color:var(--green); }
+.exam-opt.wrong   { border-color:var(--red)!important; background:var(--red-soft)!important; }
+.exam-opt.wrong .opt-num { border-color:var(--red); color:var(--red); }
+.exam-opt.disabled { cursor:default; pointer-events:none; }
+.exam-feedback {
+  padding:12px 16px; border-radius:8px; font-size:.84rem;
+  margin-bottom:8px; display:none; font-family:'Noto Sans JP',sans-serif; line-height:1.6;
+}
+.exam-feedback.show { display:block; }
+.exam-feedback.ok { background:var(--green-light); color:var(--green); }
+.exam-feedback.bad { background:var(--red-soft); color:var(--red); } { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
 .kt-mode-btn {
   padding:9px 20px; border-radius:6px; border:1.5px solid var(--border);
   background:white; font-family:'DM Mono',monospace; font-size:.76rem;
@@ -508,6 +567,7 @@ details[open] summary { color: var(--red); }
   <button class="tab" onclick="showPage('quiz',this)">✏️ Quiz</button>
   <button class="tab" onclick="showPage('reading',this)">📄 Reading</button>
   <button class="tab" onclick="showPage('conversation',this)">💬 Conversation</button>
+  <button class="tab" onclick="showPage('exam',this)">📝 Exam Practice</button>
   <button class="tab" onclick="showPage('katakana',this)">ア Katakana</button>
 </nav>
 
@@ -701,6 +761,48 @@ details[open] summary { color: var(--red); }
     <h2 class="section-h">会話パターン Conversation Sentence Patterns</h2>
     <div class="page-desc">Ready-made structures for common conversational situations.</div>
     <div class="cv-patterns-list" id="cv-patterns-list"></div>
+  </div>
+</div>
+
+<!-- ══ EXAM PRACTICE ══ -->
+<div id="page-exam" class="page">
+  <div class="page-title">試験練習 <em>Exam Practice</em></div>
+  <div class="page-desc">JLPT-style questions for N5 and N4. Choose a section to practise.</div>
+
+  <div id="exam-setup">
+    <div class="exam-setup-grid" id="exam-setup-grid"></div>
+  </div>
+
+  <div id="exam-active" style="display:none">
+    <div class="exam-wrap">
+      <div class="exam-header">
+        <div>
+          <div class="exam-section-label" id="exam-section-label"></div>
+          <div class="exam-progress-text" id="exam-progress-text"></div>
+        </div>
+        <button class="btn outline" style="padding:6px 14px;font-size:.72rem" onclick="endExam()">✕ End</button>
+      </div>
+      <div class="exam-dots" id="exam-dots"></div>
+      <div class="exam-q-card" id="exam-q-card"></div>
+      <div class="exam-options" id="exam-options"></div>
+      <div class="exam-feedback" id="exam-feedback"></div>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:4px">
+        <button class="btn" id="exam-next-btn" onclick="examNext()" style="display:none">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="exam-results" style="display:none">
+    <div class="score-card" style="max-width:500px">
+      <div class="score-big" id="exam-score-big"></div>
+      <div class="score-lbl">correct</div>
+      <div class="score-msg" id="exam-score-msg"></div>
+      <div class="wrong-list" id="exam-wrong-list"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn" onclick="examRetry()">Try again</button>
+        <button class="btn outline" onclick="endExam()">Back to sections</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2092,6 +2194,7 @@ function showPage(id, el) {
   if (id==='dashboard')    renderDashboard();
   if (id==='katakana')     renderKtChart();
   if (id==='conversation') renderConversation();
+  if (id==='exam')         renderExamSetup();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3120,6 +3223,287 @@ function cvSection(id, btn) {
   document.querySelectorAll('.cv-section').forEach(s=>s.style.display='none');
   document.getElementById('cv-'+id).style.display='block';
 }
+
+// ═══════════════════════════════════════════════════════════
+// EXAM PRACTICE DATA
+// ═══════════════════════════════════════════════════════════
+
+const EXAM_SECTIONS = [
+  { id:'vocab-n5',   icon:'📖', title:'N5 Vocabulary',            level:'N5',    desc:'Choose the correct meaning or reading', color:'blue', count:20 },
+  { id:'vocab-n4',   icon:'📗', title:'N4 Vocabulary',            level:'N4',    desc:'Lesson vocabulary from your Miyuki sessions', color:'gold', count:20 },
+  { id:'kanji-n5',   icon:'漢', title:'N5 Kanji Reading',         level:'N5',    desc:'Select the correct reading of the kanji', color:'blue', count:20 },
+  { id:'grammar-n5', icon:'文', title:'N5 Grammar',               level:'N5',    desc:'Fill in the blank with the correct grammar', color:'blue', count:15 },
+  { id:'grammar-n4', icon:'文', title:'N4 Grammar',               level:'N4',    desc:'Fill in the blank with the correct N4 grammar', color:'gold', count:15 },
+  { id:'reading-n5', icon:'📄', title:'N5 Reading Comprehension', level:'N5',    desc:'Read the passage and answer questions', color:'blue', count:8 },
+  { id:'reading-n4', icon:'📄', title:'N4 Reading Comprehension', level:'N4',    desc:'Read the passage and answer questions', color:'gold', count:8 },
+  { id:'mixed',      icon:'🎯', title:'Mixed Practice',           level:'N5+N4', desc:'Random mix of all question types', color:'red', count:20 },
+];
+
+const EQ_VOCAB_N5 = [
+  {q:'「おおきい」のいみはどれですか。',opts:['big','small','fast','old'],ans:0,exp:'おおきい (大きい) means big or large.'},
+  {q:'「たのしい」のいみはどれですか。',opts:['sad','busy','fun','tired'],ans:2,exp:'たのしい (楽しい) means fun or enjoyable.'},
+  {q:'「かいます」のいみはどれですか。',opts:['to sell','to borrow','to buy','to read'],ans:2,exp:'かいます (買います) means to buy.'},
+  {q:'「むずかしい」のいみはどれですか。',opts:['easy','difficult','interesting','boring'],ans:1,exp:'むずかしい (難しい) means difficult.'},
+  {q:'「はやい」のいみはどれですか。',opts:['slow','late','fast / early','high'],ans:2,exp:'はやい can mean fast (速い) or early (早い).'},
+  {q:'「ちかい」のいみはどれですか。',opts:['far','near / close','wide','narrow'],ans:1,exp:'ちかい (近い) means near or close.'},
+  {q:'「かえります」のいみはどれですか。',opts:['to go','to come','to return home','to wait'],ans:2,exp:'かえります (帰ります) means to return home.'},
+  {q:'「しずかな」のいみはどれですか。',opts:['noisy','busy','lively','quiet'],ans:3,exp:'しずかな (静かな) means quiet.'},
+  {q:'「やすい」のいみはどれですか。',opts:['expensive','cheap','old','new'],ans:1,exp:'やすい (安い) means cheap.'},
+  {q:'「ともだち」のいみはどれですか。',opts:['family','teacher','friend','colleague'],ans:2,exp:'ともだち (友達) means friend.'},
+  {q:'「べんきょうします」のいみはどれですか。',opts:['to work','to study','to teach','to rest'],ans:1,exp:'べんきょうします (勉強します) means to study.'},
+  {q:'「あつい」のいみはどれですか（てんきのばあい）。',opts:['cold','hot','warm','cool'],ans:1,exp:'あつい (暑い) means hot weather.'},
+  {q:'「すきな」のいみはどれですか。',opts:['disliked','strange','liked','boring'],ans:2,exp:'すきな (好きな) means liked or favourite.'},
+  {q:'「でんしゃ」のいみはどれですか。',opts:['bus','taxi','train','bicycle'],ans:2,exp:'でんしゃ (電車) means train.'},
+  {q:'「あさ」のいみはどれですか。',opts:['night','afternoon','morning','evening'],ans:2,exp:'あさ (朝) means morning.'},
+  {q:'「みせ」のいみはどれですか。',opts:['road','park','school','shop'],ans:3,exp:'みせ (店) means shop.'},
+  {q:'「つかいます」のいみはどれですか。',opts:['to make','to use','to break','to fix'],ans:1,exp:'つかいます (使います) means to use.'},
+  {q:'「げんきな」のいみはどれですか。',opts:['tired','sick','energetic / healthy','sad'],ans:2,exp:'げんきな (元気な) means energetic or healthy.'},
+  {q:'「おそい」のいみはどれですか。',opts:['fast','early','slow / late','loud'],ans:2,exp:'おそい (遅い) means slow or late.'},
+  {q:'「りょこう」のいみはどれですか。',opts:['hobby','work','travel','shopping'],ans:2,exp:'りょこう (旅行) means travel or trip.'},
+];
+
+const EQ_VOCAB_N4 = [
+  {q:'「じゅんちょう」のいみはどれですか。',opts:['going badly','going smoothly','going slowly','going quickly'],ans:1,exp:'じゅんちょう (順調) means going smoothly.'},
+  {q:'「なれます」のいみはどれですか。',opts:['to forget','to remember','to get used to','to be surprised'],ans:2,exp:'なれます (慣れます) means to get used to something.'},
+  {q:'「そなえます」のいみはどれですか。',opts:['to evacuate','to prepare','to check','to rescue'],ans:1,exp:'そなえます (備えます) means to prepare.'},
+  {q:'「あわてます」のいみはどれですか。',opts:['to be calm','to rush / panic','to be careful','to wait'],ans:1,exp:'あわてます (慌てます) means to rush or panic.'},
+  {q:'「ちしき」のいみはどれですか。',opts:['information','experience','knowledge','skill'],ans:2,exp:'ちしき (知識) means knowledge.'},
+  {q:'「やくにたちます」のいみはどれですか。',opts:['to be difficult','to be useful','to be interesting','to be important'],ans:1,exp:'やくにたちます (役に立ちます) means to be useful.'},
+  {q:'「まんがいち」のいみはどれですか。',opts:['absolutely','immediately','just in case','as usual'],ans:2,exp:'まんがいち (万が一) means just in case / in an unlikely emergency.'},
+  {q:'「きちょうひん」のいみはどれですか。',opts:['emergency medicine','valuables','important documents','daily necessities'],ans:1,exp:'きちょうひん (貴重品) means valuables.'},
+  {q:'「そつぎょう」のいみはどれですか。',opts:['entrance exam','graduation','resignation','promotion'],ans:1,exp:'そつぎょう (卒業) means graduation.'},
+  {q:'「かいがい」のいみはどれですか。',opts:['countryside','capital city','abroad','downtown'],ans:2,exp:'かいがい (海外) means abroad or overseas.'},
+  {q:'「ていねいな」のいみはどれですか。',opts:['strict','selfish','polite / careful','cheerful'],ans:2,exp:'ていねいな (丁寧な) means polite or careful.'},
+  {q:'「のこります」のいみはどれですか。',opts:['to increase','to decrease','to remain','to disappear'],ans:2,exp:'のこります (残ります) means to remain or be left over.'},
+  {q:'「そだてます」のいみはどれですか。',opts:['to discover','to plant','to raise / nurture','to harvest'],ans:2,exp:'そだてます (育てます) means to raise or bring up.'},
+  {q:'「れんらくします」のいみはどれですか。',opts:['to confirm','to contact','to cancel','to apply'],ans:1,exp:'れんらくします (連絡します) means to contact.'},
+  {q:'「じだい」のいみはどれですか。',opts:['century','generation','era / period','history'],ans:2,exp:'じだい (時代) means era or period.'},
+  {q:'「たいけん」のいみはどれですか。',opts:['result','experience','ability','confidence'],ans:1,exp:'たいけん (体験) means personal experience.'},
+  {q:'「ひなんします」のいみはどれですか。',opts:['to prepare','to check','to evacuate','to rescue'],ans:2,exp:'ひなんします (避難します) means to evacuate.'},
+  {q:'「しあわせな」のいみはどれですか。',opts:['lonely','worried','happy / fortunate','busy'],ans:2,exp:'しあわせな (幸せな) means happy or fortunate.'},
+  {q:'「ところで」のいみはどれですか。',opts:['therefore','however','by the way','as a result'],ans:2,exp:'ところで means by the way — used to change the subject.'},
+  {q:'「すこしずつ」のいみはどれですか。',opts:['all at once','little by little','very quickly','from now on'],ans:1,exp:'すこしずつ (少しずつ) means little by little.'},
+];
+
+const EQ_KANJI_N5 = [
+  {q:'「山」はどうよみますか。',opts:['うみ','やま','かわ','そら'],ans:1,exp:'山 is read やま meaning mountain.'},
+  {q:'「水」はどうよみますか。',opts:['ひ','き','みず','かぜ'],ans:2,exp:'水 is read みず meaning water.'},
+  {q:'「日曜日」はどうよみますか。',opts:['もくようび','にちようび','かようび','きんようび'],ans:1,exp:'日曜日 is read にちようび — Sunday.'},
+  {q:'「食べます」はどうよみますか。',opts:['のみます','みます','たべます','つくります'],ans:2,exp:'食べます is read たべます meaning to eat.'},
+  {q:'「大きい」はどうよみますか。',opts:['ちいさい','ながい','おおきい','たかい'],ans:2,exp:'大きい is read おおきい meaning big.'},
+  {q:'「学校」はどうよみますか。',opts:['だいがく','がっこう','きょうしつ','としょかん'],ans:1,exp:'学校 is read がっこう meaning school.'},
+  {q:'「電車」はどうよみますか。',opts:['ちかてつ','くるま','でんしゃ','バス'],ans:2,exp:'電車 is read でんしゃ meaning train.'},
+  {q:'「毎日」はどうよみますか。',opts:['まいにち','まいあさ','まいばん','まいとし'],ans:0,exp:'毎日 is read まいにち meaning every day.'},
+  {q:'「今年」はどうよみますか。',opts:['らいねん','きょねん','ことし','まいとし'],ans:2,exp:'今年 is read ことし meaning this year.'},
+  {q:'「友達」はどうよみますか。',opts:['かぞく','せんせい','ともだち','がくせい'],ans:2,exp:'友達 is read ともだち meaning friend.'},
+  {q:'「新しい」はどうよみますか。',opts:['ふるい','あたらしい','むずかしい','おもしろい'],ans:1,exp:'新しい is read あたらしい meaning new.'},
+  {q:'「右」はどうよみますか。',opts:['ひだり','うえ','した','みぎ'],ans:3,exp:'右 is read みぎ meaning right direction.'},
+  {q:'「入ります」はどうよみますか。',opts:['でます','きます','はいります','いきます'],ans:2,exp:'入ります is read はいります meaning to enter.'},
+  {q:'「長い」はどうよみますか。',opts:['みじかい','ながい','おおい','おもい'],ans:1,exp:'長い is read ながい meaning long.'},
+  {q:'「外」はどうよみますか。',opts:['なか','うえ','した','そと'],ans:3,exp:'外 is read そと meaning outside.'},
+  {q:'「白い」はどうよみますか。',opts:['くろい','あかい','しろい','あおい'],ans:2,exp:'白い is read しろい meaning white.'},
+  {q:'「時間」はどうよみますか。',opts:['じかん','ねんかん','しゅうかん','かんじ'],ans:0,exp:'時間 is read じかん meaning time.'},
+  {q:'「来年」はどうよみますか。',opts:['ことし','きょねん','らいねん','まいとし'],ans:2,exp:'来年 is read らいねん meaning next year.'},
+  {q:'「出ます」はどうよみますか。',opts:['はいります','きます','でます','もどります'],ans:2,exp:'出ます is read でます meaning to go out.'},
+  {q:'「安い」はどうよみますか。',opts:['たかい','やすい','ながい','おもい'],ans:1,exp:'安い is read やすい meaning cheap.'},
+];
+
+const EQ_GRAMMAR_N5 = [
+  {q:'まいにち にほんご を べんきょうし（　）。',opts:['ます','て','で','に'],ans:0,exp:'〜ます is the polite present/future affirmative form.'},
+  {q:'ここ（　）しゃしんをとっても いいですか。',opts:['で','に','を','が'],ans:0,exp:'で marks location of an action.'},
+  {q:'コーヒー（　）のみながら、ほんをよみます。',opts:['で','に','を','は'],ans:2,exp:'を marks the direct object.'},
+  {q:'えきの まえ（　）まってください。',opts:['が','で','に','を'],ans:2,exp:'に marks location with waiting/meeting.'},
+  {q:'あめが ふって（　）、うちに います。',opts:['いるのに','いるから','いるまで','いること'],ans:1,exp:'〜ているから gives reason: because it is raining.'},
+  {q:'しゅくだいを して（　）、あそびます。',opts:['から','まで','ながら','のに'],ans:0,exp:'してから means after doing homework.'},
+  {q:'このみせは たかい（　）、おいしくないです。',opts:['のに','から','ので','のは'],ans:0,exp:'〜のに = even though / despite.'},
+  {q:'もっとゆっくり はなして（　）。',opts:['もいいです','ください','はいけません','います'],ans:1,exp:'〜てください is a polite request.'},
+  {q:'にほんへ いった（　）あります。',opts:['ことが','ものが','のが','ところが'],ans:0,exp:'〜たことがあります = have had the experience of.'},
+  {q:'たなかさんは いま でんわして（　）。',opts:['います','あります','きます','いきます'],ans:0,exp:'〜ています expresses an ongoing action.'},
+  {q:'ねる（　）に、はをみがきます。',opts:['まえ','あと','とき','ため'],ans:0,exp:'ねるまえに = before sleeping.'},
+  {q:'この えいが は おもしろ（　）。',opts:['います','そうです','なります','あります'],ans:1,exp:'おもしろそうです = it looks interesting.'},
+  {q:'らいねん にほんに いく（　）です。',opts:['つもり','ところ','ばかり','はず'],ans:0,exp:'〜つもりです = intend to.'},
+  {q:'もし あめが ふっ（　）、いきません。',opts:['ながら','てから','たら','ので'],ans:2,exp:'〜たら = conditional: if it rains.'},
+  {q:'くすりを のん（　）、はやく ねてください。',opts:['でから','なので','ので','のに'],ans:0,exp:'〜てから = after taking medicine.'},
+];
+
+const EQ_GRAMMAR_N4 = [
+  {q:'このかんじは おぼえ（　）です。',opts:['やすい','にくい','すぎ','はじめ'],ans:0,exp:'おぼえやすい = easy to remember.'},
+  {q:'このくつは あるき（　）です。',opts:['やすい','にくい','すぎ','おわり'],ans:1,exp:'あるきにくい = hard to walk in.'},
+  {q:'たべ（　）て、おなかが いたいです。',opts:['やすく','にくく','すぎ','はじめ'],ans:2,exp:'たべすぎて = ate too much.'},
+  {q:'かじの（　）は、119ばんに でんわしてください。',opts:['ところ','ばあい','まえ','あと'],ans:1,exp:'〜の場合は = in the case of ~.'},
+  {q:'べんきょうした（　）、しけんに おちました。',opts:['ので','から','のに','けど'],ans:2,exp:'〜のに = even though I studied (disappointment).'},
+  {q:'ちょうど いまから しあいが はじまる（　）です。',opts:['ばかり','ところ','はず','つもり'],ans:1,exp:'〜るところです = just about to do.'},
+  {q:'にほんに きた（　）です。',opts:['ところ','はず','ばかり','つもり'],ans:2,exp:'〜たばかりです = just did ~ very recently.'},
+  {q:'3じごろ ここに つく（　）です。',opts:['つもり','ところ','ばかり','はず'],ans:3,exp:'〜はずです = should / I expect that.'},
+  {q:'かいしゃに はいった（　）なのに、もう やめたいです。',opts:['ばかり','ところ','はず','つもり'],ans:0,exp:'〜たばかりなのに = even though I just joined.'},
+  {q:'あめが ふり（　）ました。',opts:['おわり','はじめ','すぎ','にくく'],ans:1,exp:'ふりはじめました = it started raining.'},
+  {q:'しゅくだいを し（　）ました。',opts:['はじめ','すぎ','おわり','にくく'],ans:2,exp:'しおわりました = finished doing homework.'},
+  {q:'このかめらは しょしんしゃ（　）つかいやすいです。',opts:['にとって','ために','によって','から'],ans:0,exp:'〜にとって = for ~ / from ~\'s perspective.'},
+  {q:'おそくなって（　）。',opts:['ください','しまいました','すみません','います'],ans:2,exp:'〜てすみません = I\'m sorry for ~ing.'},
+  {q:'にほんごを べんきょうし（　）た（　）なので、まだ じょうずに はなせません。',opts:['はじめ・ばかり','おわり・ところ','すぎ・はず','にくく・のに'],ans:0,exp:'べんきょうしはじめたばかりなので = because I just started studying.'},
+  {q:'このスマホは つかい（　）です。',opts:['やすい','にくい','すぎる','はじめる'],ans:0,exp:'つかいやすい = easy to use (user-friendly).'},
+];
+
+const EQ_READING_N5 = [
+  {passage:`わたしは まいにち 6じに おきます。それから シャワーを あびて、あさごはんを たべます。7じに いえを でて、えきまで あるきます。でんしゃで かいしゃへ いきます。かいしゃは 9じに はじまります。`,
+    questions:[
+      {q:'この人は まいにち なんじに おきますか。',opts:['5じ','6じ','7じ','8じ'],ans:1,exp:'毎日6時に起きます — gets up at 6 every day.'},
+      {q:'この人は えきまで どうやって いきますか。',opts:['でんしゃで','バスで','くるまで','あるいて'],ans:3,exp:'駅まで歩きます — walks to the station.'},
+    ]},
+  {passage:`きのう ともだちと えいがを みました。えいがの あとで、レストランで ばんごはんを たべました。レストランは にぎやかで、りょうりも おいしかったです。でも、すこし たかかったです。`,
+    questions:[
+      {q:'きのう この人は はじめに なにを しましたか。',opts:['ばんごはんをたべた','えいがをみた','かいものをした','ともだちにあった'],ans:1,exp:'映画を見ました — watched a film first.'},
+      {q:'レストランは どうでしたか。',opts:['しずかでやすかった','にぎやかでたかかった','しずかでたかかった','にぎやかでやすかった'],ans:1,exp:'賑やかで、料理もおいしかったが、少し高かった.'},
+    ]},
+  {passage:`わたしの へやは あまり ひろくないです。でも、まどが おおきくて、ひかりが はいります。つくえと いすと ベッドが あります。テレビは ありません。`,
+    questions:[
+      {q:'この人の へやに なにが ありますか。',opts:['テレビとつくえ','つくえといすとベッド','まどとテレビ','いすとテレビ'],ans:1,exp:'机と椅子とベッドがあります。テレビはありません.'},
+      {q:'この人の へやは どんな へやですか。',opts:['ひろくてくらい','せまいがあかるい','ひろくてあかるい','せまくてくらい'],ans:1,exp:'あまり広くない (small) but 窓が大きくて光が入る (bright).'},
+    ]},
+  {passage:`にほんでは、4がつに しんがっきが はじまります。こどもたちは あたらしい がっこうや クラスに はいります。さくらも 4がつごろ さきます。だから、4がつは にほんじんに とって とくべつな つきです。`,
+    questions:[
+      {q:'にほんで しんがっきは なんがつに はじまりますか。',opts:['1がつ','3がつ','4がつ','9がつ'],ans:2,exp:'4月に新学期が始まります — new school term starts in April.'},
+      {q:'さくらは いつごろ さきますか。',opts:['1がつごろ','3がつごろ','4がつごろ','12がつごろ'],ans:2,exp:'桜も4月ごろ咲きます — cherry blossoms bloom around April.'},
+    ]},
+];
+
+const EQ_READING_N4 = [
+  {passage:`図書館は知識の宝庫です。いろいろな情報が集められています。図書館へ行けば、いつでも必要な本が手に入るはずです。しかし、図書館に欲しい本がないときや、調べに行く時間がないときがあります。そんなとき、電子図書館が役に立ちます。電子図書館はパソコンを使って図書館を利用するシステムです。`,
+    questions:[
+      {q:'電子図書館とはどんなシステムですか。',opts:['ほんをかりるシステム','パソコンをつかってとしょかんをりようするシステム','ほんをかうシステム','としょかんにいくシステム'],ans:1,exp:'パソコンを使って図書館を利用するシステム.'},
+      {q:'電子図書館はどんなときにやくにたちますか。',opts:['としょかんがやすみのとき','ほんがたかいとき','としょかんにいくじかんがないとき','としょかんがとおいとき'],ans:2,exp:'調べに行く時間がないとき — when there is no time to go.'},
+    ]},
+  {passage:`先週、ガスレンジの調子がおかしかったので、ガスサービスセンターに電話しました。先週直したばかりなのに、また火がすぐ消えてしまうんです。係員は「5時ごろには行けると思います」と言いました。でも、5時になっても来ませんでした。もう一度電話したら、「今そちらに向かっているところです」と言いました。`,
+    questions:[
+      {q:'ガスレンジはどんなもんだいがありましたか。',opts:['ガスがでない','ひがすぐきえる','おとがうるさい','つかいにくい'],ans:1,exp:'先週直したばかりなのに、また火がすぐ消えてしまう.'},
+      {q:'5じになっても かかりいんが こなかったとき、この人はどうしましたか。',opts:['またでんわした','まちつづけた','キャンセルした','じぶんでなおした'],ans:0,exp:'もう一度電話したら — called again.'},
+    ]},
+  {passage:`日本語を勉強し始めたばかりなので、まだ日本語が上手に話せません。でも、毎日少しずつ勉強しています。先生は「やっと発音がよくなってきましたね」と言ってくれました。この言葉がとてもうれしかったです。これからもがんばります。`,
+    questions:[
+      {q:'このひとのにほんごのべんきょうについて、ただしいものはどれですか。',opts:['にほんごをべんきょうしおわった','まいにちすこしずつべんきょうしている','もうじょうずにはなせる','べんきょうをやめた'],ans:1,exp:'毎日少しずつ勉強しています.'},
+      {q:'「この言葉」とはなにですか。',opts:['まいにちべんきょうしてください','はつおんがよくなってきた','もっとがんばってください','はやくじょうずになりましょう'],ans:1,exp:'先生の言葉: やっと発音がよくなってきましたね.'},
+    ]},
+  {passage:`地震の場合は、エレベーターを使わないでください。まず、非常口を確認してください。貴重品をもって、すばやく避難場所へ行ってください。万が一、家族と連絡が取れない場合は、避難場所で待ち合わせをしましょう。あわてないで、落ち着いて行動することが大切です。`,
+    questions:[
+      {q:'じしんのとき、エレベーターはどうしますか。',opts:['つかってもいい','つかわないほうがいい','つかわなければならない','つかってください'],ans:1,exp:'エレベーターを使わないでください.'},
+      {q:'かぞくとれんらくがとれないばあい、どうしますか。',opts:['うちでまつ','ひなんばしょでまちあわせをする','けいさつにれんらくする','ひとりでひなんする'],ans:1,exp:'避難場所で待ち合わせをしましょう.'},
+    ]},
+];
+
+let EX = { section:null, questions:[], idx:0, score:0, wrongs:[], lastSection:null };
+
+function renderExamSetup() {
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-active').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'none';
+  const grid = document.getElementById('exam-setup-grid');
+  if (grid.children.length) return;
+  grid.innerHTML = EXAM_SECTIONS.map(s=>`
+    <div class="exam-section-card" onclick="startExam('${s.id}')">
+      <div class="esc-icon">${s.icon}</div>
+      <div class="esc-title">${s.title}</div>
+      <div class="esc-desc">${s.desc}</div>
+      <div class="esc-meta">
+        <span class="tag tag-${s.color==='blue'?'blue':s.color==='gold'?'gold':'red'}">${s.level}</span>
+        <span class="tag tag-grey">${s.count} questions</span>
+      </div>
+    </div>`).join('');
+}
+
+function getQuestionsForSection(id) {
+  const flat = passages => passages.flatMap(p=>p.questions.map(q=>({...q,passage:p.passage,isReading:true})));
+  const pools = {
+    'vocab-n5':   EQ_VOCAB_N5,
+    'vocab-n4':   EQ_VOCAB_N4,
+    'kanji-n5':   EQ_KANJI_N5,
+    'grammar-n5': EQ_GRAMMAR_N5,
+    'grammar-n4': EQ_GRAMMAR_N4,
+    'reading-n5': flat(EQ_READING_N5),
+    'reading-n4': flat(EQ_READING_N4),
+    'mixed': shuffle([...EQ_VOCAB_N5,...EQ_VOCAB_N4,...EQ_KANJI_N5,...EQ_GRAMMAR_N5,...EQ_GRAMMAR_N4]),
+  };
+  return shuffle([...(pools[id]||[])]);
+}
+
+function startExam(sectionId) {
+  const sec = EXAM_SECTIONS.find(s=>s.id===sectionId);
+  EX.section = sec; EX.lastSection = sectionId;
+  EX.questions = getQuestionsForSection(sectionId).slice(0, sec.count);
+  EX.idx = 0; EX.score = 0; EX.wrongs = [];
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-active').style.display = 'block';
+  document.getElementById('exam-results').style.display = 'none';
+  document.getElementById('exam-section-label').textContent = sec.title;
+  showExamQ();
+}
+
+function showExamQ() {
+  const q = EX.questions[EX.idx];
+  document.getElementById('exam-progress-text').textContent = `Question ${EX.idx+1} of ${EX.questions.length}`;
+  document.getElementById('exam-dots').innerHTML = EX.questions.map((_,i)=>{
+    let c='dot';
+    if(i<EX.idx) c+= EX.wrongs.find(w=>w.idx===i)?' bad':' ok';
+    if(i===EX.idx) c+=' cur';
+    return `<div class="${c}"></div>`;
+  }).join('');
+  let html = `<div class="eq-type">${EX.section.title}</div>`;
+  if(q.isReading && q.passage) html += `<div class="eq-passage">${q.passage}</div>`;
+  html += `<div class="eq-question">${EX.idx+1}. ${q.q}</div>`;
+  document.getElementById('exam-q-card').innerHTML = html;
+  document.getElementById('exam-options').innerHTML = q.opts.map((o,i)=>`
+    <button class="exam-opt" onclick="selectExamOpt(this,${i})">
+      <div class="opt-num">${i+1}</div><span>${o}</span>
+    </button>`).join('');
+  const fb = document.getElementById('exam-feedback');
+  fb.className = 'exam-feedback'; fb.textContent = '';
+  document.getElementById('exam-next-btn').style.display = 'none';
+}
+
+function selectExamOpt(el, chosen) {
+  if(document.getElementById('exam-next-btn').style.display !== 'none') return;
+  const q = EX.questions[EX.idx];
+  document.querySelectorAll('.exam-opt').forEach(o=>o.classList.add('disabled'));
+  const isOk = chosen === q.ans;
+  el.classList.add(isOk?'correct':'wrong');
+  if(!isOk){
+    document.querySelectorAll('.exam-opt')[q.ans].classList.add('correct');
+    EX.wrongs.push({idx:EX.idx, q:q.q, correct:q.opts[q.ans]});
+  } else { EX.score++; }
+  const fb = document.getElementById('exam-feedback');
+  fb.className = 'exam-feedback show '+(isOk?'ok':'bad');
+  fb.textContent = (isOk?'✓ せいかい！ ':'✗ ちがいます。')+(q.exp||'');
+  document.getElementById('exam-next-btn').style.display = 'inline-block';
+  if(EX.idx===EX.questions.length-1) document.getElementById('exam-next-btn').textContent = 'Results →';
+  const dots = document.getElementById('exam-dots').children;
+  if(dots[EX.idx]) dots[EX.idx].className = 'dot '+(isOk?'ok':'bad');
+}
+
+function examNext() {
+  EX.idx++;
+  if(EX.idx>=EX.questions.length){ showExamResults(); return; }
+  document.getElementById('exam-next-btn').textContent = 'Next →';
+  showExamQ();
+}
+
+function showExamResults() {
+  document.getElementById('exam-active').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'block';
+  const pct = Math.round(EX.score/EX.questions.length*100);
+  document.getElementById('exam-score-big').textContent = `${EX.score}/${EX.questions.length}`;
+  const msgs = [[90,'すばらしい！Excellent — JLPT-ready!'],[70,'よくできました！Good work, keep it up.'],[50,'まあまあです。Review the missed ones and try again.'],[0,'がんばって！Lots to review — you\'ll get there!']];
+  document.getElementById('exam-score-msg').textContent = `${pct}% — `+(msgs.find(([t])=>pct>=t)||msgs[3])[1];
+  document.getElementById('exam-wrong-list').innerHTML = EX.wrongs.length
+    ? `<h4>Review these (${EX.wrongs.length})</h4>`+EX.wrongs.map(w=>`<div class="wrong-item"><div class="wq">${w.q.replace(/<[^>]+>/g,'')}</div><div class="wa">✓ ${w.correct}</div></div>`).join('')
+    : '';
+}
+
+function examRetry() { startExam(EX.lastSection); }
+function endExam() {
+  document.getElementById('exam-active').style.display='none';
+  document.getElementById('exam-results').style.display='none';
+  renderExamSetup();
+}
+
 // renderDashboard() is called by onSignedIn() above
 </script>
 </body>
